@@ -167,6 +167,12 @@ h3{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(20px,2.3vw
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{display:none}
 
+/* ── X CAROUSEL (가능한 X 값들) ── */
+.x-carousel{overflow:hidden;width:100%;-webkit-mask-image:linear-gradient(90deg,transparent 0%,black 7%,black 93%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,black 7%,black 93%,transparent 100%)}
+.x-track{display:flex;gap:14px;width:max-content;animation:xScroll 26s linear infinite}
+@keyframes xScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.x-pill{background:#fff;border:2px solid #BFDBFE;border-radius:14px;padding:14px 28px;font-size:18px;font-weight:700;color:#2563EB;white-space:nowrap;box-shadow:0 2px 12px rgba(37,99,235,.08);flex-shrink:0}
+
 /* ── BEFORE/AFTER ROWS ── */
 .ba-step{display:flex;align-items:flex-start;gap:12px;padding:8px 0;font-size:15px;line-height:1.55}
 .arrow-d{text-align:center;font-size:18px;color:#94A3B8;margin:2px 0}
@@ -367,37 +373,56 @@ h3{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(20px,2.3vw
 
 <!-- ═══ S7 · 학습 처방 (가장 중요한 메시지) ═══ -->
 <div class="slide bg-b" data-slide="7">
-  <div class="inner" style="max-width:1280px">
+  <div class="inner" style="max-width:1280px;gap:14px">
     <div class="badge a1">💡 가장 중요한 한 가지</div>
     <h2 class="a2">"성적 예측"이 아니라<br><span class="tb hl-b">"학습 처방"입니다</span></h2>
     <div class="div-b a3"></div>
 
-    <!-- X → Y 시각화 -->
-    <div class="a4" style="display:flex;align-items:center;justify-content:center;gap:32px;margin-top:28px">
-      <div style="text-align:center">
-        <div style="font-size:13px;font-weight:800;color:#94A3B8;letter-spacing:1.2px;margin-bottom:12px">X · 우리가 바꿀 수 있는 것</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:320px">
-          <div class="pill" style="font-size:15px;padding:10px 18px;text-align:center">복습 시간</div>
-          <div class="pill" style="font-size:15px;padding:10px 18px;text-align:center">숙제 이행</div>
-          <div class="pill" style="font-size:15px;padding:10px 18px;text-align:center">출석률</div>
-          <div class="pill" style="font-size:15px;padding:10px 18px;text-align:center">집중도</div>
+    <!-- X: 가로 캐러셀 -->
+    <div class="a4" style="width:100%;margin-top:14px">
+      <div style="font-size:13px;font-weight:800;color:#94A3B8;letter-spacing:1.2px;margin-bottom:12px;text-align:center">X · 우리가 바꿀 수 있는 것</div>
+      <div class="x-carousel">
+        <div class="x-track">
+          <div class="x-pill">복습 시간</div>
+          <div class="x-pill">숙제 이행률</div>
+          <div class="x-pill">출석률</div>
+          <div class="x-pill">수업 집중도</div>
+          <div class="x-pill">자기주도 학습</div>
+          <div class="x-pill">과제 수행</div>
+          <div class="x-pill">학습 태도</div>
+          <div class="x-pill">주간 학습 계획</div>
+          <div class="x-pill">시험 대비 준비</div>
+          <div class="x-pill">상담 빈도</div>
+          <!-- duplicate for seamless loop -->
+          <div class="x-pill">복습 시간</div>
+          <div class="x-pill">숙제 이행률</div>
+          <div class="x-pill">출석률</div>
+          <div class="x-pill">수업 집중도</div>
+          <div class="x-pill">자기주도 학습</div>
+          <div class="x-pill">과제 수행</div>
+          <div class="x-pill">학습 태도</div>
+          <div class="x-pill">주간 학습 계획</div>
+          <div class="x-pill">시험 대비 준비</div>
+          <div class="x-pill">상담 빈도</div>
         </div>
-      </div>
-      <div style="font-size:54px;color:#2563EB;font-weight:900;line-height:1">→</div>
-      <div style="text-align:center">
-        <div style="font-size:13px;font-weight:800;color:#94A3B8;letter-spacing:1.2px;margin-bottom:12px">Y · 목표 결과</div>
-        <div style="background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;border-radius:16px;padding:22px 44px;font-size:26px;font-weight:800;box-shadow:0 10px 28px rgba(37,99,235,.35);letter-spacing:-0.01em">목표 성적</div>
       </div>
     </div>
 
+    <!-- Arrow down -->
+    <div class="a5" style="font-size:42px;color:#2563EB;font-weight:900;line-height:1;margin:2px 0">↓</div>
+
+    <!-- Y: 고정 -->
+    <div class="a5" style="text-align:center">
+      <div style="font-size:13px;font-weight:800;color:#94A3B8;letter-spacing:1.2px;margin-bottom:10px">Y · 목표 결과</div>
+      <div style="display:inline-block;background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;border-radius:16px;padding:18px 52px;font-size:24px;font-weight:800;box-shadow:0 10px 28px rgba(37,99,235,.35);letter-spacing:-0.01em">목표 성적</div>
+    </div>
+
     <!-- Hero 메시지 카드 -->
-    <div class="card-blue a5" style="padding:36px 44px;margin-top:28px;max-width:1180px">
-      <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.55);letter-spacing:1px;margin-bottom:14px">우리가 집중해야 할 것</div>
-      <p style="font-size:22px;font-weight:700;line-height:1.65">
-        성적(Y) <span style="opacity:.55">"예측"</span>에 집중하지 마시고,<br>
-        <strong style="font-size:26px">"목표 Y가 되려면 앞단의 어떤 X를 개선해야 할까?"</strong><br>
-        데이터로 계산·분석하며 옳은 방향으로 코칭하는<br>
-        <strong style="font-size:30px;letter-spacing:-.01em">"학습 처방"</strong>에 집중하셔야 합니다.
+    <div class="card-blue a6" style="padding:28px 40px;margin-top:14px;max-width:1180px">
+      <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.55);letter-spacing:1px;margin-bottom:12px">우리가 집중해야 할 것</div>
+      <p style="font-size:20px;font-weight:700;line-height:1.65;color:#fff">
+        성적(Y) "예측"에 집중하지 마시고, "목표 Y가 되려면 앞단의 어떤 X를 개선해야 할까?"<br>
+        데이터로 계산·분석하며 옳은 방향으로 코칭하는 "학습 처방"에 집중하셔야 합니다.
       </p>
     </div>
   </div>
