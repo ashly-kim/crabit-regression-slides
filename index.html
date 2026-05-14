@@ -167,6 +167,12 @@ h3{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(20px,2.3vw
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{display:none}
 
+/* ── TYPEWRITER (S2) ── */
+.tw-char{opacity:0;transition:opacity .12s ease}
+.tw-char.shown{opacity:1}
+.tw-cursor{display:inline-block;color:#2563EB;font-weight:400;margin-left:4px;animation:twBlink .65s infinite;font-family:'Pretendard',monospace}
+@keyframes twBlink{0%,50%{opacity:1}51%,100%{opacity:0}}
+
 /* ── X CAROUSEL (가능한 X 값들) ── */
 .x-carousel{overflow:hidden;width:100%;-webkit-mask-image:linear-gradient(90deg,transparent 0%,black 7%,black 93%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,black 7%,black 93%,transparent 100%)}
 .x-track{display:flex;gap:14px;width:max-content;animation:xScroll 26s linear infinite}
@@ -206,14 +212,17 @@ h3{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(20px,2.3vw
   </div>
 </div>
 
-<!-- ═══ S2 · 전환 ═══ -->
+<!-- ═══ S2 · 전환 (타이프라이터) ═══ -->
 <div class="slide bg-b" data-slide="2">
   <div class="inner">
     <div class="badge a1">📊 2차시 마무리</div>
-    <h1 class="a2">회귀분석이 <span class="tb">교육 현장에서</span></h1>
-    <h1 class="a3">어떻게 <span class="hl-b tb">적용되고 있나요?</span></h1>
-    <div class="div-b a4"></div>
-    <p class="sub a5">전 세계 교육 현장에서 회귀분석이 쓰이는 방식</p>
+    <h1 id="s2-h1">
+      <span class="tw-line">회귀분석이 <span class="tb">교육 현장에서</span></span>
+      <br>
+      <span class="tw-line">어떻게 <span class="hl-b tb">적용되고 있나요?</span></span><span class="tw-cursor">|</span>
+    </h1>
+    <div class="div-b" id="s2-div" style="opacity:0;transition:opacity .5s ease"></div>
+    <p class="sub" id="s2-sub" style="opacity:0;transition:opacity .5s ease">전 세계 교육 현장에서 회귀분석이 쓰이는 방식</p>
   </div>
 </div>
 
@@ -460,87 +469,6 @@ h3{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(20px,2.3vw
   </div>
 </div>
 
-<!-- ═══ S15 · 원장님·선생님 주의사항 ═══ -->
-<div class="slide bg-b" data-slide="15">
-  <div class="inner" style="align-items:flex-start;max-width:1280px">
-    <div class="badge badge-red a1">⚠️ 원장님·선생님이 주의할 점</div>
-    <h2 class="a2 h-left">분석 결과, <span class="tb hl-b">이렇게 다뤄야 합니다</span></h2>
-    <div class="div-bl a3"></div>
-
-    <div class="grid-2 a4" style="margin-top:14px;gap:12px">
-      <div class="el-row"><div class="el-num">01</div><div><h3 style="font-size:15px;margin-bottom:4px">인과로 단정하지 않기</h3><p style="font-size:13px;color:#64748B;line-height:1.55">회귀계수는 관련성과 기대 변화일 뿐, 무조건 오른다는 보장이 아닙니다.</p></div></div>
-      <div class="el-row"><div class="el-num">02</div><div><h3 style="font-size:15px;margin-bottom:4px">과도한 일반화 금지</h3><p style="font-size:13px;color:#64748B;line-height:1.55">한 반의 결과를 모든 학생에게 그대로 적용하는 것이 이에 해당됩니다.</p></div></div>
-      <div class="el-row"><div class="el-num">03</div><div><h3 style="font-size:15px;margin-bottom:4px">변수 해석의 함정 주의</h3><p style="font-size:13px;color:#64748B;line-height:1.55">공부시간이 길다고 항상 좋은 건 아닙니다. 기초가 약하면 점수가 늦게 오릅니다.</p></div></div>
-      <div class="el-row"><div class="el-num">04</div><div><h3 style="font-size:15px;margin-bottom:4px">낙인 효과 방지</h3><p style="font-size:13px;color:#64748B;line-height:1.55">"위험 학생" 같은 표현은 위축을 줍니다. 말투와 공개 범위를 조심하세요.</p></div></div>
-      <div class="el-row"><div class="el-num">05</div><div><h3 style="font-size:15px;margin-bottom:4px">데이터 품질 확인</h3><p style="font-size:13px;color:#64748B;line-height:1.55">출석·과제·학습시간 입력값이 부정확하면 리포트 전체 신뢰도가 떨어집니다.</p></div></div>
-      <div class="el-row"><div class="el-num">06</div><div><h3 style="font-size:15px;margin-bottom:4px">행동 중심 언어로 번역</h3><p style="font-size:13px;color:#64748B;line-height:1.55">통계 용어 대신 "주당 복습 N시간 = 기대점수 +M점"으로 말합니다.</p></div></div>
-      <div class="el-row el-row-d" style="grid-column:1/-1"><div class="el-num">07</div><div><h3 style="font-size:15px;margin-bottom:4px;color:#fff">정기 재학습 필수</h3><p style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.55">시험 난도·교재·학년 분위기가 바뀌면 모델도 다시 점검해야 합니다.</p></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ S16 · 학부모·학생 주의사항 ═══ -->
-<div class="slide bg-b" data-slide="16">
-  <div class="inner" style="align-items:flex-start;max-width:1280px">
-    <div class="badge badge-red a1">⚠️ 학부모·학생이 주의할 점</div>
-    <h2 class="a2 h-left">리포트, <span class="tb hl-b">이렇게 읽어야 합니다</span></h2>
-    <div class="div-bl a3"></div>
-
-    <div class="grid-2 a4" style="margin-top:14px;gap:12px">
-      <div class="el-row"><div class="el-num">01</div><div><h3 style="font-size:15px;margin-bottom:4px">예측값을 절대값으로 믿지 않기</h3><p style="font-size:13px;color:#64748B;line-height:1.55">리포트는 미래를 확정하는 게 아니라, 현재 데이터를 바탕으로 한 추정치입니다.</p></div></div>
-      <div class="el-row"><div class="el-num">02</div><div><h3 style="font-size:15px;margin-bottom:4px">한 번의 결과로 판단하지 않기</h3><p style="font-size:13px;color:#64748B;line-height:1.55">최근 시험 한 번보다 여러 회차의 추세를 함께 보는 게 맞습니다.</p></div></div>
-      <div class="el-row"><div class="el-num">03</div><div><h3 style="font-size:15px;margin-bottom:4px">개인 차이를 고려하기</h3><p style="font-size:13px;color:#64748B;line-height:1.55">같은 학습시간이라도 이해도·집중력·과목 난이도에 따라 효과가 다릅니다.</p></div></div>
-      <div class="el-row"><div class="el-num">04</div><div><h3 style="font-size:15px;margin-bottom:4px">행동 목표로 읽기</h3><p style="font-size:13px;color:#64748B;line-height:1.55">"점수 몇 점"보다 "어떤 습관을 바꿀지"에 집중해야 실질적 도움이 됩니다.</p></div></div>
-      <div class="el-row"><div class="el-num">05</div><div><h3 style="font-size:15px;margin-bottom:4px">비교 스트레스 조심</h3><p style="font-size:13px;color:#64748B;line-height:1.55">다른 학생과의 단순 비교보다 자기 변화 추적이 더 중요합니다.</p></div></div>
-      <div class="el-row"><div class="el-num">06</div><div><h3 style="font-size:15px;margin-bottom:4px">질문을 남기기</h3><p style="font-size:13px;color:#64748B;line-height:1.55">어떤 변수로 계산했는지, 언제 데이터인지, 과목별인지 확인하세요.</p></div></div>
-      <div class="ribbon" style="grid-column:1/-1">리포트의 핵심은 <span style="opacity:.7">"누가 잘못했나"</span>가 아니라 <strong>"무엇을 바꾸면 좋아질 가능성이 큰가"</strong>입니다.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ S17 · Before / After ═══ -->
-<div class="slide bg-b" data-slide="17">
-  <div class="inner" style="max-width:1280px">
-    <div class="badge a1">🔄 운영 방식의 차이</div>
-    <h2 class="a2">데이터로 운영하는 학원은 <span class="tb hl-b">무엇이 다를까요?</span></h2>
-    <p class="sub a3">같은 학생, 같은 데이터 — 접근법이 바뀌면 결과가 달라집니다</p>
-
-    <div style="display:grid;grid-template-columns:1fr 50px 1fr;gap:18px;width:100%;max-width:1200px;align-items:stretch;margin-top:18px">
-      <div class="compare-col compare-bad a4">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <div style="background:#FEE2E2;color:#DC2626;padding:4px 12px;border-radius:14px;font-size:12px;font-weight:700">BEFORE</div>
-          <h3 style="font-size:18px;color:#DC2626">감으로 운영</h3>
-        </div>
-        <div class="ba-step"><span style="font-size:18px">😰</span><p style="color:#475569">성적이 <strong>떨어진 후</strong> 인지</p></div>
-        <div class="arrow-d">↓</div>
-        <div class="ba-step"><span style="font-size:18px">📞</span><p style="color:#475569">학부모 전화 먼저 옴</p></div>
-        <div class="arrow-d">↓</div>
-        <div class="ba-step"><span style="font-size:18px">🤷</span><p style="color:#475569">"열심히 하겠습니다" 막연한 약속</p></div>
-        <div class="arrow-d">↓</div>
-        <div class="ba-step"><span style="font-size:18px">😤</span><p style="color:#475569">학부모: "그래서 어떻게 오른다는 건가요?"</p></div>
-        <div style="margin-top:12px;padding:10px 14px;background:#fff;border-radius:10px"><p style="font-size:13px;color:#DC2626;font-weight:700">결과: 늦은 개입 → 신뢰 하락 → 이탈</p></div>
-      </div>
-
-      <div class="a5" style="display:flex;justify-content:center;align-items:center;font-size:46px;color:#2563EB;font-weight:900">→</div>
-
-      <div class="compare-col compare-good a6" style="background:linear-gradient(135deg,#2563EB,#3B82F6);border:none;color:#fff">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <div style="background:rgba(255,255,255,.2);padding:4px 12px;border-radius:14px;font-size:12px;font-weight:700">AFTER</div>
-          <h3 style="font-size:18px">데이터로 운영</h3>
-        </div>
-        <div class="ba-step"><span style="font-size:18px">📊</span><p>출석·숙제 패턴 이상 감지</p></div>
-        <div class="arrow-d w">↓</div>
-        <div class="ba-step"><span style="font-size:18px">⚡</span><p>회귀모델이 <strong>성적 전에</strong> 위험 신호 포착</p></div>
-        <div class="arrow-d w">↓</div>
-        <div class="ba-step"><span style="font-size:18px">🎯</span><p>"복습 주 2시간 → 3개월 내 +8점 예상"</p></div>
-        <div class="arrow-d w">↓</div>
-        <div class="ba-step"><span style="font-size:18px">💛</span><p>학부모: "데이터로 관리해주는구나"</p></div>
-        <div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,.18);border-radius:10px"><p style="font-size:13px;font-weight:700">✅ LMS 조기 개입 → 이탈률 20% 감소 (실증)</p></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ═══ S18 · 여정 1/3 · 알게 된 것 ═══ -->
 <div class="slide bg-b" data-slide="18">
   <div class="inner" style="align-items:flex-start;max-width:1280px">
@@ -725,7 +653,7 @@ h3{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(20px,2.3vw
     <!-- INSTINCT → DATA -->
     <div class="a4" style="display:flex;justify-content:center;align-items:center;gap:36px;margin-top:38px">
       <div style="text-align:center">
-        <div style="font-size:46px;font-weight:900;color:#94A3B8;line-height:1;letter-spacing:-1px">INSTINCT</div>
+        <div style="font-size:42px;font-weight:900;color:#94A3B8;line-height:1;letter-spacing:-1px">GUT FEELING</div>
         <div style="font-size:13px;color:#94A3B8;margin-top:8px;font-weight:700;letter-spacing:1.5px">BEFORE</div>
       </div>
       <div style="font-size:42px;color:#2563EB;font-weight:900">→</div>
@@ -780,7 +708,7 @@ h3{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(20px,2.3vw
 
 <div class="nav">
   <button class="nav-btn" id="prev">‹</button>
-  <span class="counter" id="counter">1 / 18</span>
+  <span class="counter" id="counter">1 / 15</span>
   <button class="nav-btn" id="next">›</button>
 </div>
 
@@ -847,10 +775,55 @@ bar.style.width = `${(1 / total) * 100}%`;
 
 /* ── PER-SLIDE TRIGGERS ── */
 function triggerSlide(idx) {
+  if (idx === 1) setTimeout(runS2Typewriter, 250); // 전환 슬라이드 타이프라이터
   if (idx === 3) countUp('#s3num', 89);    // Portugal global
   if (idx === 4) countUp('#s5num', 82);    // LMS
   if (idx === 5) countUp('#s6num', 1062);  // 국내 대학 연구
 }
+
+/* ── TYPEWRITER (S2) ── */
+let s2Chars = null;
+function setupS2Typewriter() {
+  if (s2Chars) return;
+  const h1 = document.getElementById('s2-h1');
+  if (!h1) return;
+  s2Chars = [];
+  const walk = (n) => {
+    if (n.nodeType === 3) {
+      const text = n.textContent;
+      const frag = document.createDocumentFragment();
+      for (const c of text) {
+        const span = document.createElement('span');
+        span.className = 'tw-char';
+        span.textContent = c;
+        frag.appendChild(span);
+        s2Chars.push(span);
+      }
+      n.parentNode.replaceChild(frag, n);
+    } else if (n.nodeType === 1) {
+      if (n.classList && n.classList.contains('tw-cursor')) return;
+      if (n.tagName === 'BR') return;
+      [...n.childNodes].forEach(walk);
+    }
+  };
+  walk(h1);
+}
+function runS2Typewriter() {
+  setupS2Typewriter();
+  if (!s2Chars || !s2Chars.length) return;
+  s2Chars.forEach(c => c.classList.remove('shown'));
+  const divEl = document.getElementById('s2-div');
+  const subEl = document.getElementById('s2-sub');
+  if (divEl) divEl.style.opacity = '0';
+  if (subEl) subEl.style.opacity = '0';
+  s2Chars.forEach((c, i) => {
+    setTimeout(() => c.classList.add('shown'), 70 * i);
+  });
+  const totalMs = 70 * s2Chars.length;
+  setTimeout(() => { if (divEl) divEl.style.opacity = '1'; }, totalMs + 200);
+  setTimeout(() => { if (subEl) subEl.style.opacity = '1'; }, totalMs + 400);
+}
+setupS2Typewriter();
 
 function countUp(sel, target, duration = 1400) {
   const el = document.querySelector(sel);
