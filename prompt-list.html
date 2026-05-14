@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>LLM 회귀분석 프롬프트 가이드 | 크래빗 아카데미</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at center,#1E293B 0%,#0F172A 100%);font-family:'Pretendard','Noto Sans KR',-apple-system,sans-serif;color:#1E293B}
+
+/* ── STAGE & DECK ── */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.deck{width:1600px;height:900px;position:relative;overflow:hidden;background:#FAFBFF;border-radius:10px;box-shadow:0 30px 100px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.05);transform-origin:center center;flex-shrink:0;will-change:transform}
+.slide{position:absolute;inset:0;width:1600px;height:900px;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px 72px;opacity:0;pointer-events:none;transition:opacity .5s ease}
+.slide.active{opacity:1;pointer-events:all}
+.inner{width:100%;max-width:1280px;display:flex;flex-direction:column;align-items:center;gap:16px}
+
+/* ── BACKGROUNDS ── */
+.bg-a{background:radial-gradient(ellipse at 20% 20%,#DBEAFE 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,#BFDBFE 0%,transparent 50%),linear-gradient(135deg,#F8FAFF 0%,#EFF6FF 100%)}
+.bg-b{background:linear-gradient(135deg,#F8FAFC 0%,#EFF6FF 60%,#F8FAFF 100%)}
+.bg-c{background:linear-gradient(160deg,#EFF6FF 0%,#F8FAFF 60%,#DBEAFE 100%)}
+.bg-d{background:radial-gradient(ellipse at 30% 30%,#1E3A8A 0%,#0F172A 100%);color:#fff}
+.bg-d *{color:inherit}
+.bg-bonus{background:linear-gradient(135deg,#0F172A 0%,#1E293B 60%,#0F2040 100%)}
+
+/* ── ANIMATIONS ── */
+@keyframes fu{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sl{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes sr{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.06)}}
+.slide.active .a1{animation:fu .55s ease both;animation-delay:.05s}
+.slide.active .a2{animation:fu .55s ease both;animation-delay:.15s}
+.slide.active .a3{animation:fu .55s ease both;animation-delay:.25s}
+.slide.active .a4{animation:fu .55s ease both;animation-delay:.35s}
+.slide.active .a5{animation:fu .55s ease both;animation-delay:.45s}
+.slide.active .a6{animation:fu .55s ease both;animation-delay:.55s}
+.slide.active .a7{animation:fu .55s ease both;animation-delay:.65s}
+.slide.active .sl1{animation:sl .55s ease both;animation-delay:.15s}
+.slide.active .sr1{animation:sr .55s ease both;animation-delay:.25s}
+
+/* ── TYPOGRAPHY ── */
+h1{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(40px,5vw,68px);font-weight:800;line-height:1.22;text-align:center;letter-spacing:-0.02em}
+h2{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(28px,3.6vw,50px);font-weight:800;line-height:1.3;text-align:center;letter-spacing:-0.015em}
+h3{font-family:'Pretendard','Noto Sans KR',sans-serif;font-size:clamp(18px,2vw,26px);font-weight:700;line-height:1.4}
+.h-left{text-align:left}
+.sub{font-size:clamp(15px,1.6vw,21px);color:#64748B;text-align:center;font-weight:500;line-height:1.65}
+.tb{color:#2563EB}.tn{color:#0F172A}.tg{color:#475569}
+.hl-b{background:linear-gradient(180deg,transparent 60%,#DBEAFE 60%);padding:0 4px}
+.hl-w{background:linear-gradient(180deg,transparent 60%,rgba(255,255,255,.25) 60%);padding:0 4px}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:24px;background:white;font-size:15px;color:#2563EB;font-weight:700;border:1.5px solid #BFDBFE;margin-bottom:8px}
+.badge-step{background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;border:none;box-shadow:0 4px 16px rgba(37,99,235,.3)}
+.badge-dark{background:#1E3A8A;color:#fff;border-color:#1E3A8A}
+.badge-bonus{background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff;border:none;box-shadow:0 4px 16px rgba(124,58,237,.3)}
+
+/* ── STEP NUMBER ── */
+.step-num{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;font-size:36px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(37,99,235,.35);flex-shrink:0;letter-spacing:-1px}
+.step-num-sm{width:56px;height:56px;border-radius:14px;font-size:24px}
+
+/* ── CARDS ── */
+.card{background:white;border-radius:18px;padding:28px;box-shadow:0 2px 18px rgba(15,23,42,.06);transition:transform .3s cubic-bezier(.4,0,.2,1),box-shadow .3s ease}
+.card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(15,23,42,.14)}
+.card-blue{background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff;border-radius:18px;padding:28px;box-shadow:0 8px 24px rgba(37,99,235,.25)}
+.card-blue *{color:inherit}
+.card-light{background:#EFF6FF;border-radius:16px;padding:22px;border:1.5px solid #DBEAFE}
+.card-dark{background:#0F172A;border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,.08)}
+
+/* ── CODE BLOCK ── */
+.code-block{background:#0F172A;border-radius:16px;padding:24px 28px;border:1px solid rgba(255,255,255,.08);position:relative;overflow:hidden}
+.code-block::before{content:'';position:absolute;top:0;left:0;right:0;height:36px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06)}
+.code-dots{position:absolute;top:11px;left:18px;display:flex;gap:8px}
+.code-dot{width:12px;height:12px;border-radius:50%}
+.code-dot.r{background:#FF5F56}.code-dot.y{background:#FFBD2E}.code-dot.g{background:#27C93F}
+.code-text{margin-top:24px;font-family:'JetBrains Mono','Fira Code','Courier New',monospace;font-size:clamp(12px,1.05vw,15px);color:#CBD5E1;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.code-text .hi{color:#93C5FD;font-weight:700}
+.code-text .num{color:#FCD34D;font-weight:700}
+.code-text .str{color:#86EFAC}
+.copy-btn{position:absolute;top:8px;right:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);border-radius:8px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.copy-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+.copy-btn.copied{background:#22C55E;color:#fff;border-color:#22C55E}
+
+/* ── GRIDS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;width:100%}
+.col{display:flex;flex-direction:column;gap:14px}
+
+/* ── LIST ── */
+.li{display:flex;align-items:flex-start;gap:12px;padding:8px 0;font-size:clamp(14px,1.4vw,18px);color:#374151;line-height:1.6;font-weight:500}
+.li-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:white;font-weight:700;margin-top:2px}
+.li-icon.b{background:#2563EB}.li-icon.g{background:#16A34A}.li-icon.r{background:#DC2626}
+.li-icon.p{background:#7C3AED}
+
+/* ── RIBBON ── */
+.ribbon{background:#1E40AF;color:white;border-radius:14px;padding:18px 28px;font-size:clamp(15px,1.6vw,20px);font-weight:700;text-align:center;width:100%;line-height:1.5}
+.ribbon-green{background:linear-gradient(135deg,#059669,#10B981)}
+.ribbon-dark{background:#0F172A}
+
+/* ── DIVIDERS ── */
+.div-b{width:64px;height:4px;background:#2563EB;border-radius:2px;margin:12px auto}
+.div-bl{width:56px;height:4px;background:#2563EB;border-radius:2px}
+.div-p{width:56px;height:4px;background:#7C3AED;border-radius:2px}
+
+/* ── DECORATIVE ── */
+.dec{position:absolute;opacity:.1;pointer-events:none;font-size:72px}
+.dec-tl{top:10%;left:8%;animation:fl 4.5s ease-in-out infinite}
+.dec-tr{top:12%;right:9%;animation:fl 5s ease-in-out infinite 1s}
+.dec-bl{bottom:14%;left:9%;animation:fl 4s ease-in-out infinite .5s}
+.dec-br{bottom:12%;right:8%;animation:fl 5.5s ease-in-out infinite 1.5s}
+
+/* ── FLOW STEPS (사용방법) ── */
+.flow-item{background:white;border-radius:16px;padding:22px 18px;box-shadow:0 2px 14px rgba(15,23,42,.06);text-align:center;transition:transform .3s ease,box-shadow .3s ease;border:2px solid transparent}
+.flow-item:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(15,23,42,.14);border-color:#BFDBFE}
+.flow-arrow{font-size:28px;color:#BFDBFE;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── BONUS CARD ── */
+.bonus-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:22px;backdrop-filter:blur(8px);transition:all .3s ease}
+.bonus-card:hover{background:rgba(255,255,255,.1);border-color:rgba(167,139,250,.5);transform:translateY(-3px)}
+
+/* ── TIP CARD ── */
+.tip-card{background:white;border-radius:16px;padding:24px;box-shadow:0 2px 14px rgba(15,23,42,.06);border-left:4px solid #2563EB}
+.tip-card.warn{border-left-color:#DC2626;background:#FEF2F2}
+
+/* ── NAV ── */
+.nav{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);padding:9px 18px;border-radius:40px;box-shadow:0 6px 24px rgba(15,23,42,.16)}
+.nav-btn{width:36px;height:36px;border-radius:50%;border:none;background:#2563EB;color:white;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nav-btn:hover{background:#1D4ED8;transform:scale(1.05)}
+.counter{font-size:13px;color:#475569;font-weight:600;min-width:60px;text-align:center}
+.bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#2563EB,#60A5FA);transition:width .4s ease;z-index:100;border-radius:0 3px 3px 0}
+
+/* ── CURSOR ── */
+*,*::before,*::after{cursor:none!important}
+.cursor{position:fixed;top:0;left:0;width:28px;height:28px;border:2px solid rgba(37,99,235,.7);border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);transition:width .22s ease,height .22s ease,background .22s ease,border-color .22s ease,opacity .2s ease;backdrop-filter:blur(2px)}
+.cursor::after{content:'';position:absolute;top:50%;left:50%;width:7px;height:7px;background:#2563EB;border-radius:50%;transform:translate(-50%,-50%);transition:opacity .2s ease}
+.cursor.hover{width:54px;height:54px;background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.45)}
+.cursor.hover::after{opacity:0}
+::-webkit-scrollbar{display:none}
+
+/* ── STEP PROGRESS ── */
+.step-progress{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sp-dot{width:10px;height:10px;border-radius:50%;background:#E2E8F0;transition:all .3s ease}
+.sp-dot.done{background:#2563EB}
+.sp-dot.current{background:#2563EB;width:28px;border-radius:5px}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="bar" id="bar"></div>
+
+<div class="stage">
+<div class="deck" id="deck">
+
+<!-- ═══ S1 · COVER ═══ -->
+<div class="slide bg-a active" data-slide="1">
+  <div class="dec dec-tl">✨</div>
+  <div class="dec dec-tr">🤖</div>
+  <div class="dec dec-bl">📊</div>
+  <div class="dec dec-br">💬</div>
+  <div class="inner" style="gap:22px">
+    <div class="badge a1">CRABIT ACADEMY · AI 학습성공방정식 2차시 실습</div>
+    <h1 class="a2" style="margin-top:6px">학원장을 위한<br><span class="tb hl-b">LLM 회귀분석</span> 프롬프트 가이드</h1>
+    <div class="div-b a3"></div>
+    <p class="sub a4">대화하듯 하나씩 — 8단계 프롬프트로 우리 학원만의 성공 방정식을 만드세요</p>
+    <div class="a5" style="display:flex;align-items:center;gap:16px;margin-top:14px;flex-wrap:wrap;justify-content:center">
+      <div style="background:white;border-radius:50px;padding:14px 28px;display:inline-flex;align-items:center;gap:20px;box-shadow:0 4px 20px rgba(15,23,42,.1)">
+        <div style="display:flex;align-items:center;gap:8px;font-size:18px;color:#1E293B;font-weight:600">📅 <span>2026.05.15 (목)</span></div>
+        <div style="width:1.5px;height:20px;background:#E2E8F0"></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:18px;color:#1E293B;font-weight:600">👤 <span>크래빗 아카데미</span></div>
+      </div>
+    </div>
+    <div class="a6" style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;justify-content:center">
+      <span style="background:linear-gradient(135deg,#2563EB,#3B82F6);border-radius:12px;padding:10px 22px;font-size:16px;font-weight:700;color:#fff;box-shadow:0 4px 16px rgba(37,99,235,.3)">📊 200명 샘플 데이터 기반의 실습</span>
+      <span style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:10px 20px;font-size:16px;font-weight:700;color:#2563EB">STEP 1~8 + BONUS</span>
+      <span style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:12px;padding:10px 20px;font-size:16px;font-weight:700;color:#15803D">복사해서 바로 사용 가능</span>
+      <span style="background:#FEF3C7;border:1.5px solid #FDE68A;border-radius:12px;padding:10px 20px;font-size:16px;font-weight:700;color:#92400E">전문 용어 없이 OK</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S2 · 사용 방법 ═══ -->
+<div class="slide bg-b" data-slide="2">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="badge a1">📌 시작 전 꼭 읽어주세요</div>
+    <h2 class="a2 h-left">이렇게 사용하세요</h2>
+    <div class="div-bl a3"></div>
+
+    <div class="a4" style="display:flex;align-items:stretch;gap:14px;width:100%;margin-top:16px">
+      <div class="flow-item" style="flex:1">
+        <div style="font-size:44px;margin-bottom:14px">💬</div>
+        <div style="font-size:12px;font-weight:800;color:#2563EB;letter-spacing:.5px;margin-bottom:8px">STEP 1부터 순서대로</div>
+        <h3 style="font-size:19px;margin-bottom:10px">하나씩 입력</h3>
+        <p style="font-size:14px;color:#64748B;line-height:1.65">처음부터 모든 걸<br>물어보지 않아도 됩니다</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item" style="flex:1">
+        <div style="font-size:44px;margin-bottom:14px">🔍</div>
+        <div style="font-size:12px;font-weight:800;color:#2563EB;letter-spacing:.5px;margin-bottom:8px">결과가 나오면</div>
+        <h3 style="font-size:19px;margin-bottom:10px">"이게 무슨 뜻이야?" 추가 질문</h3>
+        <p style="font-size:14px;color:#64748B;line-height:1.65">결과만 받고 끝내면<br>핵심을 놓칩니다</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item" style="flex:1">
+        <div style="font-size:44px;margin-bottom:14px">📈</div>
+        <div style="font-size:12px;font-weight:800;color:#2563EB;letter-spacing:.5px;margin-bottom:8px">대화하듯 깊게</div>
+        <h3 style="font-size:19px;margin-bottom:10px">분석을 발전시키기</h3>
+        <p style="font-size:14px;color:#64748B;line-height:1.65">BONUS 질문으로<br>더 깊이 파고들기</p>
+      </div>
+    </div>
+
+    <div class="grid-3 a5" style="margin-top:18px;width:100%">
+      <div class="tip-card" style="border-left-color:#2563EB">
+        <div style="font-size:13px;font-weight:800;color:#2563EB;letter-spacing:.5px;margin-bottom:8px">✅ 내 상황을 설명한다</div>
+        <p style="font-size:14px;color:#374151;line-height:1.6">"우리 학원 중등부", "3개월 목표" 등 맥락을 넣을수록 답이 구체적으로 나옵니다</p>
+      </div>
+      <div class="tip-card" style="border-left-color:#16A34A">
+        <div style="font-size:13px;font-weight:800;color:#16A34A;letter-spacing:.5px;margin-bottom:8px">✅ 원하는 출력 형식을 말한다</div>
+        <p style="font-size:14px;color:#374151;line-height:1.6">"순위로", "표로", "학부모 말로" — 형식을 지정하면 바로 쓸 수 있는 결과가 나옵니다</p>
+      </div>
+      <div class="tip-card" style="border-left-color:#9333EA">
+        <div style="font-size:13px;font-weight:800;color:#9333EA;letter-spacing:.5px;margin-bottom:8px">✅ 어려운 용어 불필요</div>
+        <p style="font-size:14px;color:#374151;line-height:1.6">"성적에 뭐가 제일 중요해?" — 이런 말도 LLM이 회귀분석으로 풀어줍니다</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S3 · STEP 1 ═══ -->
+<div class="slide bg-b" data-slide="3">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-step">STEP 1</div>
+      <div class="step-progress">
+        <div class="sp-dot current"></div>
+        <div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div>
+        <div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div>
+      </div>
+    </div>
+    <h2 class="a2 h-left">데이터를 던지고<br><span class="tb hl-b">'성공 방정식'</span> 요청하기</h2>
+    <div class="div-bl a3"></div>
+
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:28px;width:100%;margin-top:12px;align-items:flex-start">
+      <div class="col a4">
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">💡 이 단계의 목적</div>
+          <p style="font-size:15px;color:#1E293B;line-height:1.7;font-weight:600">첫 프롬프트는 원장님이 LLM에게 분석을 <strong class="tb">'의뢰'</strong>하는 순간</p>
+        </div>
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">📊 요청하는 내용</div>
+          <div class="li"><span class="li-icon b">1</span><span>성적에 <strong>가장 큰 영향</strong>을 주는 요인</span></div>
+          <div class="li"><span class="li-icon b">2</span><span>구체적인 숫자로 된 <strong>성공 방정식</strong></span></div>
+          <div class="li"><span class="li-icon b">3</span><span><strong>학부모 언어</strong>로 쉽게 정리</span></div>
+        </div>
+        <div style="background:#FEF3C7;border:1.5px solid #FDE68A;border-radius:14px;padding:16px 18px">
+          <p style="font-size:14px;color:#92400E;font-weight:600;line-height:1.6">전문 용어 없이 학원 원장님처럼 말하면 됩니다 👌</p>
+        </div>
+      </div>
+      <div class="code-block a5">
+        <div class="code-dots">
+          <div class="code-dot r"></div>
+          <div class="code-dot y"></div>
+          <div class="code-dot g"></div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        <div class="code-text">이건 우리 학원 중등부 <span class="num">200명</span> 학생들의 실제 학습 데이터야.
+
+이 데이터를 분석해서 다음을 알려줘:
+<span class="num">1.</span> 성적에 가장 큰 영향을 주는 요인이 뭔지
+<span class="num">2.</span> <span class="str">"복습 시간을 1시간 늘리면 성적이 몇 점 오르는지"</span>처럼
+   구체적인 숫자로 된 우리 학원만의 학습 성공 방정식을 만들어줘
+<span class="num">3.</span> 결과를 학부모한테 설명하듯 쉽게 정리해줘
+
+어려운 통계 용어보다는 학원 현장에서 바로 쓸 수 있는 언어로 설명해줘.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S4 · STEP 2 ═══ -->
+<div class="slide bg-b" data-slide="4">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-step">STEP 2</div>
+      <div class="step-progress">
+        <div class="sp-dot done"></div>
+        <div class="sp-dot current"></div>
+        <div class="sp-dot"></div><div class="sp-dot"></div>
+        <div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div>
+      </div>
+    </div>
+    <h2 class="a2 h-left">결과를 읽는 프롬프트 —<br><span class="tb hl-b">숫자의 의미</span> 파악하기</h2>
+    <div class="div-bl a3"></div>
+
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:28px;width:100%;margin-top:12px;align-items:flex-start">
+      <div class="col a4">
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">💡 이 단계의 목적</div>
+          <p style="font-size:15px;color:#1E293B;line-height:1.7;font-weight:600">분석 결과가 나왔을 때, <strong class="tb">숫자가 무슨 뜻인지</strong> 물어보는 단계</p>
+        </div>
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:8px">📌 기울기(계수)란?</div>
+          <div style="background:white;border-radius:12px;padding:14px 16px;border:1.5px solid #BFDBFE">
+            <p style="font-size:15px;font-weight:700;color:#2563EB;line-height:1.6">복습시간 계수 = <span style="font-size:20px">3.2</span></p>
+            <p style="font-size:13px;color:#64748B;margin-top:4px">복습 1시간 늘리면 → 성적 3.2점 상승</p>
+          </div>
+        </div>
+        <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:14px;padding:16px 18px">
+          <p style="font-size:14px;color:#15803D;font-weight:600;line-height:1.6">숫자 하나가 학부모 상담의 <strong>핵심 근거</strong>가 됩니다</p>
+        </div>
+      </div>
+      <div class="code-block a5">
+        <div class="code-dots">
+          <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        <div class="code-text">방금 나온 분석 결과에서
+<span class="hi">기울기(계수)</span> 숫자가 각각 무슨 의미인지 설명해줘.
+
+예를 들어 복습시간의 계수가 <span class="num">3.2</span>라면,
+이게 우리 학원 운영에서 어떤 의미인지
+학부모 상담에서 어떻게 활용할 수 있는지도 같이 알려줘.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S5 · STEP 3 ═══ -->
+<div class="slide bg-b" data-slide="5">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-step">STEP 3</div>
+      <div class="step-progress">
+        <div class="sp-dot done"></div><div class="sp-dot done"></div>
+        <div class="sp-dot current"></div>
+        <div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div>
+      </div>
+    </div>
+    <h2 class="a2 h-left">우선순위 프롬프트 —<br><span class="tb hl-b">"뭘 먼저 해야 하나?"</span> 결정하기</h2>
+    <div class="div-bl a3"></div>
+
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:28px;width:100%;margin-top:12px;align-items:flex-start">
+      <div class="col a4">
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">💡 이 단계의 목적</div>
+          <p style="font-size:15px;color:#1E293B;line-height:1.7;font-weight:600">여러 요인 중 어디에 집중할지, <strong class="tb">자원 배분의 근거</strong>를 뽑는 단계</p>
+        </div>
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">🎯 결과물</div>
+          <div class="li"><span class="li-icon b">✓</span><span>영향력 큰 요인 <strong>순위</strong></span></div>
+          <div class="li"><span class="li-icon b">✓</span><span>시간·예산 <strong>우선순위 액션 플랜</strong></span></div>
+        </div>
+        <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:14px;padding:16px 18px">
+          <p style="font-size:14px;color:#2563EB;font-weight:600;line-height:1.6">"감"이 아닌 <strong>데이터 기반</strong> 의사결정의 시작입니다</p>
+        </div>
+      </div>
+      <div class="code-block a5">
+        <div class="code-dots">
+          <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        <div class="code-text">분석된 요인들 중에서
+성적 향상에 <span class="hi">영향력이 큰 순서대로 순위</span>를 매겨줘.
+
+그리고 우리가 학원 운영에서
+시간과 예산을 <span class="num">1순위</span>부터 어디에 집중해야 하는지
+<span class="str">우선순위 액션 플랜</span>으로 정리해줘.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S6 · STEP 4 ═══ -->
+<div class="slide bg-b" data-slide="6">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-step">STEP 4</div>
+      <div class="step-progress">
+        <div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div>
+        <div class="sp-dot current"></div>
+        <div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div>
+      </div>
+    </div>
+    <h2 class="a2 h-left">역산 프롬프트 —<br><span class="tb hl-b">목표 달성에 얼마나 필요한지</span> 계산하기</h2>
+    <div class="div-bl a3"></div>
+
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:28px;width:100%;margin-top:12px;align-items:flex-start">
+      <div class="col a4">
+        <div class="card-blue" style="padding:22px">
+          <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.5px;margin-bottom:10px">🚀 이 단계부터</div>
+          <p style="font-size:16px;font-weight:700;line-height:1.6">'<strong>진짜 경영 도구</strong>'로 느껴집니다</p>
+          <p style="font-size:14px;color:rgba(255,255,255,.8);margin-top:8px;line-height:1.5">목표 성적을 넣으면 필요한 행동량이 계산됩니다</p>
+        </div>
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">🎯 결과물 예시</div>
+          <div style="background:white;border-radius:10px;padding:14px;border:1.5px solid #BFDBFE">
+            <p style="font-size:14px;font-weight:700;color:#2563EB">목표: +10점 달성을 위해</p>
+            <div class="li" style="font-size:14px;padding:6px 0"><span class="li-icon b" style="font-size:11px;width:20px;height:20px">→</span><span>복습 시간 <strong>주당 X시간</strong> 증가</span></div>
+            <div class="li" style="font-size:14px;padding:6px 0"><span class="li-icon b" style="font-size:11px;width:20px;height:20px">→</span><span>숙제 이행률 <strong>X% 향상</strong></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="code-block a5">
+        <div class="code-dots">
+          <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        <div class="code-text">우리 학원 목표가 <span class="num">3개월</span> 안에 학생 평균 성적을 <span class="num">10점</span> 올리는 거야.
+
+방금 나온 방정식을 이용해서
+그 목표를 달성하려면
+복습 시간을 <span class="hi">주당 몇 시간</span> 늘려야 하는지,
+숙제 이행률을 <span class="hi">몇 % 높여야</span> 하는지
+<span class="str">역산해서 구체적인 수치</span>로 알려줘.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S7 · STEP 5 ═══ -->
+<div class="slide bg-b" data-slide="7">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-step">STEP 5</div>
+      <div class="step-progress">
+        <div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div>
+        <div class="sp-dot current"></div>
+        <div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div>
+      </div>
+    </div>
+    <h2 class="a2 h-left">위험 신호 프롬프트 —<br><span class="tb hl-b">도움이 필요한 학생</span> 찾기</h2>
+    <div class="div-bl a3"></div>
+
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:28px;width:100%;margin-top:12px;align-items:flex-start">
+      <div class="col a4">
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">💡 이 단계의 목적</div>
+          <p style="font-size:15px;color:#1E293B;line-height:1.7;font-weight:600">데이터에서 <span class="tb">'이상한 학생'</span>을 찾는 단계</p>
+        </div>
+        <div style="background:#FEF2F2;border:1.5px solid #FECACA;border-radius:14px;padding:18px">
+          <div style="font-size:13px;font-weight:800;color:#DC2626;letter-spacing:.5px;margin-bottom:8px">⚠️ 위험 신호 패턴</div>
+          <p style="font-size:14px;color:#7F1D1D;line-height:1.6;font-weight:600">공식대로라면 성적이 나와야 하는데 안 나오는 학생</p>
+          <p style="font-size:13px;color:#991B1B;margin-top:8px">= 즉각적인 케어가 필요한 학생</p>
+        </div>
+        <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:14px;padding:16px 18px">
+          <p style="font-size:14px;color:#15803D;font-weight:600;line-height:1.6">조기 발견 → 이탈 방지 → 재등록률 향상</p>
+        </div>
+      </div>
+      <div class="code-block a5">
+        <div class="code-dots">
+          <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        <div class="code-text">이 데이터에서
+복습 시간이나 출석률은 <span class="hi">높은데 성적이 예상보다 낮은</span> 학생들이 있어?
+
+그런 학생들을 찾아서 <span class="str">리스트</span>로 뽑아주고,
+왜 이런 패턴이 나타날 수 있는지
+학원에서 어떤 <span class="hi">케어</span>를 해야 할지도 같이 제안해줘.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S8 · STEP 6 ═══ -->
+<div class="slide bg-b" data-slide="8">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-step">STEP 6</div>
+      <div class="step-progress">
+        <div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div>
+        <div class="sp-dot current"></div>
+        <div class="sp-dot"></div><div class="sp-dot"></div>
+      </div>
+    </div>
+    <h2 class="a2 h-left">검증 프롬프트 —<br><span class="tb hl-b">이 분석을 믿어도 되는지</span> 확인하기</h2>
+    <div class="div-bl a3"></div>
+
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:28px;width:100%;margin-top:12px;align-items:flex-start">
+      <div class="col a4">
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">💡 이 단계의 목적</div>
+          <p style="font-size:15px;color:#1E293B;line-height:1.7;font-weight:600">분석 결과의 <strong class="tb">신뢰도를 확인</strong>하는 단계</p>
+        </div>
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">📊 핵심 지표</div>
+          <div style="background:white;border-radius:10px;padding:14px;border:1.5px solid #BFDBFE;margin-bottom:10px">
+            <p style="font-size:15px;font-weight:700;color:#2563EB">R² (결정계수)</p>
+            <p style="font-size:13px;color:#64748B;margin-top:4px">높을수록 설명력이 좋음</p>
+          </div>
+          <div style="background:white;border-radius:10px;padding:14px;border:1.5px solid #BFDBFE">
+            <p style="font-size:15px;font-weight:700;color:#2563EB">p-value</p>
+            <p style="font-size:13px;color:#64748B;margin-top:4px">0.05보다 낮으면 신뢰 가능</p>
+          </div>
+        </div>
+      </div>
+      <div class="code-block a5">
+        <div class="code-dots">
+          <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        <div class="code-text">이 분석 결과가 얼마나 믿을 만한지 알려줘.
+
+<span class="hi">R²</span> 값이 뭔지, 이게 높으면 어떤 의미인지
+그리고 각 요인의 <span class="hi">p-value</span>가 <span class="num">0.05</span>보다 낮은지 높은지에 따라
+이 결과를 실제 학원 운영에 <span class="str">적용해도 괜찮은지</span>
+판단 기준을 쉽게 설명해줘.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S9 · STEP 7 ═══ -->
+<div class="slide bg-b" data-slide="9">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-step">STEP 7</div>
+      <div class="step-progress">
+        <div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div>
+        <div class="sp-dot current"></div>
+        <div class="sp-dot"></div>
+      </div>
+    </div>
+    <h2 class="a2 h-left">학부모 보고서 프롬프트 —<br><span class="tb hl-b">분석 결과를 실전 문서</span>로 만들기</h2>
+    <div class="div-bl a3"></div>
+
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:28px;width:100%;margin-top:12px;align-items:flex-start">
+      <div class="col a4">
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">💡 이 단계의 목적</div>
+          <p style="font-size:15px;color:#1E293B;line-height:1.7;font-weight:600">분석 결과를 <strong class="tb">학부모 상담 자료</strong>로 바로 전환</p>
+        </div>
+        <div class="card-light">
+          <div style="font-size:13px;font-weight:800;color:#64748B;letter-spacing:.5px;margin-bottom:10px">📄 보고서 구성</div>
+          <div class="li" style="font-size:14px"><span class="li-icon b" style="font-size:11px;width:20px;height:20px">1</span><span>현재 상태 (데이터 기반)</span></div>
+          <div class="li" style="font-size:14px"><span class="li-icon b" style="font-size:11px;width:20px;height:20px">2</span><span>영향 요인 <strong>TOP 3</strong></span></div>
+          <div class="li" style="font-size:14px"><span class="li-icon b" style="font-size:11px;width:20px;height:20px">3</span><span>구체적인 <strong>행동 변화</strong></span></div>
+          <div class="li" style="font-size:14px"><span class="li-icon b" style="font-size:11px;width:20px;height:20px">4</span><span>예상 <strong>달성 기간</strong></span></div>
+        </div>
+      </div>
+      <div class="code-block a5">
+        <div class="code-dots">
+          <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        <div class="code-text">지금까지 분석한 내용을 바탕으로
+<span class="str">학부모 상담에서 쓸 수 있는 보고서</span>를 만들어줘.
+
+형식은 이렇게 해줘:
+<span class="num">-</span> 우리 아이의 현재 상태 (데이터 기반)
+<span class="num">-</span> 성적에 가장 영향을 주는 요인 <span class="hi">TOP 3</span>
+<span class="num">-</span> 목표 성적까지 필요한 구체적인 행동 변화
+<span class="num">-</span> 예상 달성 기간
+
+통계 용어 없이, <span class="str">학부모가 바로 이해할 수 있는 말</span>로 써줘.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S10 · STEP 8 ═══ -->
+<div class="slide bg-b" data-slide="10">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-step">STEP 8</div>
+      <div class="step-progress">
+        <div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div><div class="sp-dot done"></div>
+        <div class="sp-dot current"></div>
+      </div>
+    </div>
+    <h2 class="a2 h-left">시계열 프롬프트 —<br><span class="tb hl-b">3개월 후 성적</span> 예측하기</h2>
+    <div class="div-bl a3"></div>
+
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:28px;width:100%;margin-top:12px;align-items:flex-start">
+      <div class="col a4">
+        <div class="card-blue" style="padding:22px">
+          <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.5px;margin-bottom:10px">🔮 마지막 단계</div>
+          <p style="font-size:15px;font-weight:700;line-height:1.6">과거 데이터를 기반으로 <strong>미래를 예측</strong>하는 단계</p>
+          <p style="font-size:13px;color:rgba(255,255,255,.8);margin-top:8px">시계열 분석을 경험하는 순간</p>
+        </div>
+        <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:14px;padding:16px 18px">
+          <div style="font-size:13px;font-weight:800;color:#2563EB;letter-spacing:.5px;margin-bottom:8px">📊 결과 예시</div>
+          <p style="font-size:15px;font-weight:700;color:#1E293B;line-height:1.6">"78~92점 사이일 가능성이 95%"</p>
+          <p style="font-size:13px;color:#64748B;margin-top:6px">단순 숫자가 아닌 범위로 제시</p>
+        </div>
+        <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:14px;padding:16px 18px">
+          <p style="font-size:14px;color:#15803D;font-weight:600;line-height:1.6">개입 전후 예측 비교로 코칭 효과 수치화</p>
+        </div>
+      </div>
+      <div class="code-block a5">
+        <div class="code-dots">
+          <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
+        </div>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+        <div class="code-text">이 데이터에 월별 성적 추이가 있다면,
+<span class="num">3개월</span> 후 학생들의 <span class="hi">평균 성적이 어떻게 변할지</span> 예측해줘.
+
+단순한 숫자가 아니라 <span class="str">범위</span>로 알려줘.
+예: <span class="str">"78~92점 사이일 가능성이 95%"</span>처럼.
+
+그리고 지금 당장 개입하면
+이 예측이 어떻게 <span class="hi">달라지는지</span>도 같이 보여줘.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S11 · BONUS ═══ -->
+<div class="slide bg-bonus" data-slide="11">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="a1" style="display:flex;align-items:center;gap:14px">
+      <div class="badge badge-bonus">✨ BONUS</div>
+      <p style="font-size:15px;color:rgba(255,255,255,.6);font-weight:600">더 깊이 파고들고 싶을 때</p>
+    </div>
+    <h2 class="a2 h-left" style="color:#fff">심화 질문 프롬프트</h2>
+    <div class="div-p a3"></div>
+
+    <div class="grid-2 a4" style="margin-top:14px;width:100%">
+      <div class="bonus-card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔬</div>
+          <div style="font-size:13px;font-weight:800;color:#A78BFA;letter-spacing:.5px">변수 추가 실험</div>
+        </div>
+        <div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:13px;color:#CBD5E1;line-height:1.7;background:rgba(0,0,0,.3);border-radius:10px;padding:14px">"여기에 <span style="color:#93C5FD;font-weight:700">학부모 상담 횟수</span> 데이터를 추가하면<br>분석 결과가 어떻게 달라질 것 같아?"</div>
+      </div>
+
+      <div class="bonus-card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📊</div>
+          <div style="font-size:13px;font-weight:800;color:#A78BFA;letter-spacing:.5px">비교 분석</div>
+        </div>
+        <div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:13px;color:#CBD5E1;line-height:1.7;background:rgba(0,0,0,.3);border-radius:10px;padding:14px">"이 데이터를 <span style="color:#FCD34D;font-weight:700">성적 상위 25%</span>와 <span style="color:#FCA5A5;font-weight:700">하위 25%</span>로 나눠서<br>각각 성적에 영향을 주는 요인이 다른지<br>비교해줘."</div>
+      </div>
+
+      <div class="bonus-card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🏆</div>
+          <div style="font-size:13px;font-weight:800;color:#A78BFA;letter-spacing:.5px">경쟁 학원 시뮬레이션</div>
+        </div>
+        <div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:13px;color:#CBD5E1;line-height:1.7;background:rgba(0,0,0,.3);border-radius:10px;padding:14px">"기울기(학습 효율)가 <span style="color:#86EFAC;font-weight:700">2.5</span>인 우리 학원과<br>기울기가 <span style="color:#FCA5A5;font-weight:700">1.2</span>인 경쟁 학원을 비교하면<br>1년 후 성적 차이가 얼마나 벌어지는지<br>시뮬레이션해줘."</div>
+      </div>
+
+      <div class="bonus-card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(167,139,250,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💰</div>
+          <div style="font-size:13px;font-weight:800;color:#A78BFA;letter-spacing:.5px">리소스 최적화</div>
+        </div>
+        <div style="font-family:'JetBrains Mono','Courier New',monospace;font-size:13px;color:#CBD5E1;line-height:1.7;background:rgba(0,0,0,.3);border-radius:10px;padding:14px">"예산과 교사 시간이 한정되어 있을 때<br>어떤 변수에 집중하는 게<br>성적 향상 <span style="color:#FCD34D;font-weight:700">ROI</span>가 가장 높은지 알려줘."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S12 · 핵심 팁 ═══ -->
+<div class="slide bg-b" data-slide="12">
+  <div class="inner" style="align-items:flex-start;max-width:1280px">
+    <div class="badge a1">💡 핵심 팁</div>
+    <h2 class="a2 h-left">좋은 프롬프트의 조건과<br><span style="color:#DC2626">절대 하지 말아야 할 것</span></h2>
+    <div class="div-bl a3"></div>
+
+    <div class="grid-2 a4" style="margin-top:16px;width:100%">
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#2563EB;letter-spacing:.5px;margin-bottom:12px">✅ 좋은 프롬프트의 3가지 조건</div>
+        <div class="col" style="gap:12px">
+          <div class="tip-card">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:32px;height:32px;border-radius:8px;background:#2563EB;color:white;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+              <div>
+                <p style="font-size:15px;font-weight:700;color:#1E293B">내 상황을 설명한다</p>
+                <p style="font-size:13px;color:#64748B;margin-top:4px">"우리 학원 중등부", "3개월 목표" 등 맥락을 넣을수록 답이 구체적</p>
+              </div>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:32px;height:32px;border-radius:8px;background:#2563EB;color:white;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+              <div>
+                <p style="font-size:15px;font-weight:700;color:#1E293B">원하는 출력 형식을 말한다</p>
+                <p style="font-size:13px;color:#64748B;margin-top:4px">"순위로", "표로", "학부모 말로" — 형식 지정 시 바로 쓸 수 있는 결과</p>
+              </div>
+            </div>
+          </div>
+          <div class="tip-card">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:32px;height:32px;border-radius:8px;background:#2563EB;color:white;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+              <div>
+                <p style="font-size:15px;font-weight:700;color:#1E293B">어려운 용어를 쓰지 않아도 된다</p>
+                <p style="font-size:13px;color:#64748B;margin-top:4px">LLM은 "성적에 뭐가 제일 중요해?"도 회귀분석으로 풀어줌</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#DC2626;letter-spacing:.5px;margin-bottom:12px">❌ 절대 하지 말아야 할 것</div>
+        <div class="col" style="gap:12px">
+          <div class="tip-card warn">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="font-size:22px;flex-shrink:0">🚫</div>
+              <div>
+                <p style="font-size:15px;font-weight:700;color:#991B1B">한 번에 모든 걸 물어보기</p>
+                <p style="font-size:13px;color:#7F1D1D;margin-top:4px">답이 너무 길어져서 핵심을 놓칩니다</p>
+              </div>
+            </div>
+          </div>
+          <div class="tip-card warn">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="font-size:22px;flex-shrink:0">🚫</div>
+              <div>
+                <p style="font-size:15px;font-weight:700;color:#991B1B">결과만 받고 끝내기</p>
+                <p style="font-size:13px;color:#7F1D1D;margin-top:4px">"이게 무슨 뜻이야?"를 꼭 추가로 물어봐야 합니다</p>
+              </div>
+            </div>
+          </div>
+          <div class="tip-card warn">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="font-size:22px;flex-shrink:0">🚫</div>
+              <div>
+                <p style="font-size:15px;font-weight:700;color:#991B1B">숫자만 믿기</p>
+                <p style="font-size:13px;color:#7F1D1D;margin-top:4px">현장 경험과 데이터를 함께 해석해야 합니다</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div><!-- /deck -->
+</div><!-- /stage -->
+
+<div class="nav">
+  <button class="nav-btn" id="prev">‹</button>
+  <span class="counter" id="counter">1 / 12</span>
+  <button class="nav-btn" id="next">›</button>
+</div>
+
+<script>
+/* ── CURSOR ── */
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
+document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
+document.querySelectorAll('button,.card,.flow-item,.bonus-card,.tip-card,.copy-btn').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+});
+
+/* ── DECK SCALING ── */
+function fitDeck() {
+  const deck = document.getElementById('deck');
+  const s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+  deck.style.transform = `scale(${s})`;
+}
+window.addEventListener('resize', fitDeck);
+fitDeck();
+
+/* ── SLIDES ── */
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let cur = 0;
+const counter = document.getElementById('counter');
+const bar = document.getElementById('bar');
+
+function goTo(n) {
+  if (n === cur) return;
+  if (n < 0) n = total - 1;
+  if (n >= total) n = 0;
+  slides[cur].classList.remove('active');
+  cur = n;
+  slides[cur].classList.add('active');
+  counter.textContent = `${cur + 1} / ${total}`;
+  bar.style.width = `${((cur + 1) / total) * 100}%`;
+}
+function go(d) { goTo(cur + d); }
+
+document.getElementById('prev').onclick = e => { e.stopPropagation(); go(-1); };
+document.getElementById('next').onclick = e => { e.stopPropagation(); go(1); };
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') go(-1);
+});
+
+document.addEventListener('click', e => {
+  if (e.target.closest('.nav,.copy-btn')) return;
+  if (e.target.closest('a,input,textarea,select')) return;
+  const x = e.clientX, w = window.innerWidth;
+  if (x < w / 2) go(-1); else go(1);
+});
+
+bar.style.width = `${(1 / total) * 100}%`;
+
+/* ── COPY TO CLIPBOARD ── */
+function copyCode(btn) {
+  const block = btn.closest('.code-block');
+  const textEl = block.querySelector('.code-text');
+  const text = textEl.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '복사';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
