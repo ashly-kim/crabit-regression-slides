@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>학원장을 위한 회귀분석 | 마무리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<style>
+/* ─── RESET & BASE ─── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --blue:#3182F6;--blue2:#5B9EF7;--blue3:#1B6EE4;
+  --bg1:#D8ECFF;--bg2:#C8DFFF;--bg3:#DAE8FF;--bg4:#E8F2FF;
+  --text1:#191F28;--text2:#4E5968;--text3:#8B95A1;
+  --white:#fff;
+  --shadow:0 4px 24px rgba(49,130,246,.10);
+  --shadow-hover:0 12px 40px rgba(49,130,246,.18);
+}
+html,body{width:100%;height:100%;overflow:hidden;
+  font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+  color:var(--text1);}
+
+/* ─── ANIMATED GRADIENT BG ─── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:linear-gradient(-40deg,#C8DFFF,#D4E9FF,#DBF0FF,#E2EEFF,#D0E5FF,#C8DCFF);
+  background-size:400% 400%;
+  animation:bgShift 14s ease infinite;
+}
+@keyframes bgShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+/* ─── CURSOR GLOW ─── */
+#cursorGlow{
+  pointer-events:none;position:fixed;z-index:1;
+  width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(49,130,246,.13) 0%,transparent 70%);
+  transform:translate(-50%,-50%);
+  transition:transform .08s linear;
+  mix-blend-mode:normal;
+}
+#cursorDot{
+  pointer-events:none;position:fixed;z-index:9999;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--blue);
+  transform:translate(-50%,-50%);
+  transition:transform .05s linear;
+  box-shadow:0 0 12px rgba(49,130,246,.6);
+}
+
+/* ─── PARTICLES ─── */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.particle{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle,rgba(49,130,246,.18),transparent 70%);
+  animation:floatUp linear infinite;
+}
+@keyframes floatUp{
+  0%{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:1}
+  90%{opacity:.4}
+  100%{transform:translateY(-20vh) scale(1);opacity:0}
+}
+
+/* ─── PROGRESS ─── */
+#progress{
+  position:fixed;top:0;left:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--blue2));
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+  z-index:9998;border-radius:0 2px 2px 0;
+  box-shadow:0 0 8px rgba(49,130,246,.5);
+}
+
+/* ─── SLIDE SYSTEM ─── */
+.deck{position:fixed;inset:0;z-index:2;}
+.slide{
+  position:absolute;inset:0;
+  display:none;flex-direction:column;justify-content:center;
+  padding:48px 80px 76px;
+}
+.slide.active{display:flex;}
+.slide.enter{animation:slideEnter .5s cubic-bezier(.4,0,.2,1) forwards;}
+.slide.exit{animation:slideExit .3s cubic-bezier(.4,0,.2,1) forwards;}
+@keyframes slideEnter{
+  from{opacity:0;transform:translateY(18px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes slideExit{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(-12px) scale(.98)}
+}
+
+/* ─── NAV ─── */
+.nav{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.88);padding:9px 20px;
+  border-radius:50px;box-shadow:0 4px 28px rgba(0,0,0,.09);
+  backdrop-filter:blur(16px);z-index:9998;
+}
+.nav button{
+  width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--blue);color:#fff;font-size:16px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .18s,transform .18s,box-shadow .18s;
+  box-shadow:0 2px 10px rgba(49,130,246,.3);
+}
+.nav button:hover{background:var(--blue3);transform:scale(1.08);box-shadow:0 4px 16px rgba(49,130,246,.4);}
+.nav button:disabled{background:#D1D6DB;cursor:not-allowed;transform:none;box-shadow:none;}
+.nav-dots{display:flex;gap:6px;align-items:center;}
+.nav-dot{
+  width:6px;height:6px;border-radius:50%;background:rgba(49,130,246,.25);
+  cursor:pointer;transition:all .3s;
+}
+.nav-dot.on{width:20px;border-radius:3px;background:var(--blue);}
+.slide-num{font-size:13px;font-weight:600;color:var(--text3);min-width:40px;text-align:center;}
+
+/* ─── COMMON COMPONENTS ─── */
+.tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(49,130,246,.1);color:var(--blue);
+  font-size:13px;font-weight:700;letter-spacing:.2px;
+  padding:6px 14px;border-radius:20px;margin-bottom:16px;
+  border:1px solid rgba(49,130,246,.15);
+}
+.card{
+  background:rgba(255,255,255,.85);border-radius:20px;
+  padding:26px 28px;box-shadow:var(--shadow);
+  backdrop-filter:blur(12px);
+  transition:transform .25s,box-shadow .25s;
+  border:1px solid rgba(255,255,255,.6);
+}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);}
+.card-blue{
+  background:linear-gradient(135deg,var(--blue) 0%,var(--blue2) 100%);
+  color:#fff;border-radius:20px;padding:24px 28px;
+  box-shadow:0 8px 32px rgba(49,130,246,.3);
+}
+.card-light{
+  background:rgba(235,243,255,.7);border-radius:20px;padding:22px 26px;
+  border:1.5px solid rgba(49,130,246,.12);
+}
+h1{font-size:50px;font-weight:800;line-height:1.18;}
+h2{font-size:38px;font-weight:800;line-height:1.2;}
+h3{font-size:20px;font-weight:700;line-height:1.3;}
+.subtitle{font-size:18px;color:var(--text2);font-weight:500;line-height:1.65;margin-top:12px;}
+.hl{color:var(--blue);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;}
+.big-num{font-size:52px;font-weight:800;color:var(--blue);line-height:1;}
+.badge{
+  display:inline-block;background:rgba(49,130,246,.1);color:var(--blue);
+  font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;
+}
+.label{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+.divider{width:40px;height:3px;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:2px;margin-bottom:20px;}
+.dot-line{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--blue);margin-top:7px;flex-shrink:0;}
+
+/* ─── ENTRANCE ANIMATIONS ─── */
+.anim-up{opacity:0;transform:translateY(24px);transition:opacity .5s,transform .5s;}
+.anim-left{opacity:0;transform:translateX(-28px);transition:opacity .5s,transform .5s;}
+.anim-right{opacity:0;transform:translateX(28px);transition:opacity .5s,transform .5s;}
+.anim-scale{opacity:0;transform:scale(.88);transition:opacity .4s,transform .4s;}
+.anim-in{opacity:1!important;transform:none!important;}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+.d4{transition-delay:.4s}.d5{transition-delay:.5s}.d6{transition-delay:.6s}
+
+/* ─── SLIDE 1 ─── */
+#s1{align-items:center;text-align:center;}
+#s1 .s1-title{font-size:56px;font-weight:800;line-height:1.18;}
+#s1 .s1-line{width:60px;height:4px;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:2px;margin:24px auto;}
+#s1 .glow-ring{
+  position:absolute;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(49,130,246,.07) 0%,transparent 70%);
+  animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.1);opacity:1}}
+
+/* ─── SLIDE 2 CAROUSEL ─── */
+.carousel-wrap{position:relative;overflow:hidden;border-radius:20px;}
+.carousel-track{display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+.carousel-item{
+  min-width:100%;padding:28px 32px;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow:var(--shadow);
+}
+.carousel-dots{display:flex;justify-content:center;gap:8px;margin-top:14px;}
+.cdot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(49,130,246,.2);cursor:pointer;
+  transition:all .3s;
+}
+.cdot.on{width:24px;border-radius:4px;background:var(--blue);}
+.flag{font-size:32px;margin-bottom:6px;}
+.world-stat-big{font-size:64px;font-weight:800;color:var(--blue);line-height:1;}
+.world-label{font-size:13px;font-weight:700;color:var(--text3);margin-bottom:4px;}
+
+/* stats strip */
+.stat-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  margin-bottom:18px;
+}
+.stat-box{
+  background:rgba(255,255,255,.85);border-radius:16px;padding:18px 16px;
+  text-align:center;box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,.6);
+  transition:transform .25s,box-shadow .25s;
+  cursor:default;
+}
+.stat-box:hover{transform:translateY(-4px) scale(1.03);box-shadow:var(--shadow-hover);}
+.stat-box.active-stat{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#fff;
+  box-shadow:0 8px 32px rgba(49,130,246,.35);
+  transform:translateY(-6px) scale(1.05);
+}
+.stat-box.active-stat .stat-val{color:#fff;}
+.stat-box.active-stat .stat-flag{filter:none;}
+.stat-flag{font-size:24px;margin-bottom:4px;}
+.stat-val{font-size:30px;font-weight:800;color:var(--blue);}
+.stat-country{font-size:11px;font-weight:700;color:inherit;opacity:.7;margin-bottom:2px;}
+.stat-desc{font-size:11px;line-height:1.4;color:inherit;opacity:.8;}
+
+/* ─── SLIDE 4 BETA BARS ─── */
+.rank-row{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;border-radius:14px;
+  background:rgba(255,255,255,.72);margin-bottom:10px;
+  transition:transform .2s,box-shadow .2s;
+  border:1px solid rgba(255,255,255,.5);
+}
+.rank-row:hover{transform:translateX(4px);box-shadow:var(--shadow);}
+.rank-badge{
+  width:30px;height:30px;border-radius:50%;
+  font-size:13px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.rk1{background:#FFD700;color:#6B4E00;}
+.rk2{background:#B0BEC5;color:#37474F;}
+.rk3{background:#BCAAA4;color:#4E342E;}
+.beta-bg{background:rgba(49,130,246,.1);border-radius:4px;height:8px;margin-top:5px;overflow:hidden;}
+.beta-fill{height:8px;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--blue2));width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+
+/* ─── SLIDE 5 BEFORE/AFTER ─── */
+.ba-col{border-radius:20px;padding:28px;}
+.before-col{background:rgba(255,255,255,.78);border:1.5px solid #E0E5EB;}
+.after-col{background:linear-gradient(135deg,var(--blue) 0%,var(--blue2) 100%);color:#fff;box-shadow:0 8px 32px rgba(49,130,246,.3);}
+.ba-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:15px;line-height:1.55;}
+.arrow-down{text-align:center;font-size:16px;color:var(--text3);margin:2px 0;animation:arrowPulse 1.5s ease-in-out infinite;}
+.arrow-down.w{color:rgba(255,255,255,.4);}
+@keyframes arrowPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+
+/* ─── SLIDE 7 ACTION ─── */
+.action-card{
+  background:rgba(255,255,255,.88);border-radius:20px;padding:26px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;
+  transition:transform .25s,box-shadow .25s;border:1px solid rgba(255,255,255,.6);
+}
+.action-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-hover);}
+.action-icon{
+  width:44px;height:44px;border-radius:14px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#fff;font-size:20px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(49,130,246,.3);
+}
+
+/* ─── SLIDE 8 NEXT ─── */
+.compare-col{background:rgba(255,255,255,.88);border-radius:20px;padding:28px;box-shadow:var(--shadow);}
+.next-col{background:linear-gradient(135deg,var(--blue),var(--blue2));border-radius:20px;padding:28px;color:#fff;box-shadow:0 8px 32px rgba(49,130,246,.3);}
+.chk-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:15px;line-height:1.55;}
+
+/* ─── SLIDE 9 CLOSING ─── */
+#s9{align-items:center;text-align:center;}
+#s9 .closing-main{font-size:46px;font-weight:800;line-height:1.22;color:var(--text1);}
+#s9 .closing-sub{font-size:44px;font-weight:800;color:var(--blue);margin-top:6px;}
+#s9 .transform-row{display:flex;justify-content:center;align-items:center;gap:28px;margin-top:32px;}
+#s9 .tr-box{text-align:center;}
+#s9 .tr-label{font-size:13px;color:var(--text3);margin-top:6px;font-weight:600;}
+.closing-arrow{font-size:32px;color:var(--blue);animation:arrowRight 1.2s ease-in-out infinite;}
+@keyframes arrowRight{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+
+/* ─── GLOW RING DECORATIVE ─── */
+.deco-ring{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:-1;
+  background:radial-gradient(circle,rgba(49,130,246,.06),transparent 70%);
+}
+</style>
+</head>
+<body>
+
+<!-- cursor -->
+<div id="cursorGlow"></div>
+<div id="cursorDot"></div>
+
+<!-- particles -->
+<div id="particles"></div>
+
+<!-- progress -->
+<div id="progress"></div>
+
+<div class="deck">
+
+<!-- ══════════════════════════════════════
+     SLIDE 1 · 전환 타이틀
+══════════════════════════════════════ -->
+<div class="slide active" id="s1">
+  <div class="glow-ring" style="top:-100px;left:-100px;"></div>
+  <div class="glow-ring" style="bottom:-150px;right:-80px;width:400px;height:400px;animation-delay:-1.5s;"></div>
+
+  <div class="tag anim-up d1">📊 2차시 마무리</div>
+  <div class="s1-title anim-up d2">이론은 끝났습니다.<br><span class="hl">이제 현실을 보겠습니다.</span></div>
+  <div class="s1-line anim-scale d3"></div>
+  <p class="subtitle anim-up d4">전 세계 교육 현장에서 회귀분석이 쓰이는 방식</p>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 2 · 세계 사례 + 캐러셀
+══════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="tag anim-up">🌏 글로벌 사례</div>
+  <h2 class="anim-up d1">이미 전 세계 학교들이 <span class="hl">쓰고 있습니다</span></h2>
+  <p class="subtitle anim-up d2" style="margin-bottom:22px;">회귀분석은 연구소 이야기가 아닙니다. 데이터가 있는 곳이라면 어디서든.</p>
+
+  <!-- stat strip (carousel highlight) -->
+  <div class="stat-strip anim-up d2" id="statStrip">
+    <div class="stat-box active-stat" data-idx="0" onclick="setCarousel(0)">
+      <div class="stat-flag">🇵🇹</div>
+      <div class="stat-country">포르투갈</div>
+      <div class="stat-val" data-target="89">0</div><span style="font-size:16px;font-weight:800;color:inherit;">%</span>
+      <div class="stat-desc">성적 예측 정확도</div>
+    </div>
+    <div class="stat-box" data-idx="1" onclick="setCarousel(1)">
+      <div class="stat-flag">🇰🇷</div>
+      <div class="stat-country">한국</div>
+      <div class="stat-val" data-target="75">0</div><span style="font-size:16px;font-weight:800;color:var(--blue);">%</span>
+      <div class="stat-desc">부진 위험자 탐지</div>
+    </div>
+    <div class="stat-box" data-idx="2" onclick="setCarousel(2)">
+      <div class="stat-flag">💻</div>
+      <div class="stat-country">온라인 LMS</div>
+      <div class="stat-val" data-target="82">0</div><span style="font-size:16px;font-weight:800;color:var(--blue);">%</span>
+      <div class="stat-desc">성적 예측 + 이탈 20%↓</div>
+    </div>
+    <div class="stat-box" data-idx="3" onclick="setCarousel(3)">
+      <div class="stat-flag">🎯</div>
+      <div class="stat-country">맞춤 추천</div>
+      <div class="stat-val" data-target="77">0</div><span style="font-size:16px;font-weight:800;color:var(--blue);">%</span>
+      <div class="stat-desc">학생별 개인화 정확도</div>
+    </div>
+  </div>
+
+  <!-- detail carousel -->
+  <div class="carousel-wrap anim-up d3">
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-item">
+        <div style="display:flex;align-items:flex-start;gap:24px;">
+          <div style="flex:1;">
+            <div class="flag">🇵🇹</div>
+            <div class="label">포르투갈 중·고등학교</div>
+            <h3 style="font-size:18px;margin-bottom:10px;">395명 데이터 → 최종 성적 89% 예측</h3>
+            <div class="dot-line"><div class="dot"></div><p style="font-size:14px;color:var(--text2);line-height:1.6;">이전 성적(G1·G2), 출석, 학습시간, 가족관계 변수 활용</p></div>
+            <div class="dot-line"><div class="dot"></div><p style="font-size:14px;color:var(--text2);line-height:1.6;">저예측 학생 조기 식별 → 교사 사전 코칭 제공</p></div>
+          </div>
+          <div style="text-align:center;min-width:120px;">
+            <div style="font-size:60px;font-weight:800;color:var(--blue);line-height:1;">89<span style="font-size:28px;">%</span></div>
+            <div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:4px;">예측 정확도</div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div style="display:flex;align-items:flex-start;gap:24px;">
+          <div style="flex:1;">
+            <div class="flag">🇰🇷</div>
+            <div class="label">한국교육고용패널 (KEEP)</div>
+            <h3 style="font-size:18px;margin-bottom:10px;">고교 GPA + 입학성적으로 부진 위험자 탐지</h3>
+            <div class="dot-line"><div class="dot"></div><p style="font-size:14px;color:var(--text2);line-height:1.6;">Elastic Net 회귀로 학습 동기·부모 소득 변수 포함 분석</p></div>
+            <div class="dot-line"><div class="dot"></div><p style="font-size:14px;color:var(--text2);line-height:1.6;">입학 전 개입 프로그램 설계에 활용</p></div>
+          </div>
+          <div style="text-align:center;min-width:120px;">
+            <div style="font-size:60px;font-weight:800;color:var(--blue);line-height:1;">75<span style="font-size:28px;">%</span></div>
+            <div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:4px;">탐지 정확도</div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div style="display:flex;align-items:flex-start;gap:24px;">
+          <div style="flex:1;">
+            <div class="flag">💻</div>
+            <div class="label">온라인 학습 플랫폼 (LMS)</div>
+            <h3 style="font-size:18px;margin-bottom:10px;">로그인·퀴즈 데이터로 성적 82% 예측</h3>
+            <div class="dot-line"><div class="dot"></div><p style="font-size:14px;color:var(--text2);line-height:1.6;">저활동 학생에게 맞춤 알림 자동 발송</p></div>
+            <div class="dot-line"><div class="dot"></div><p style="font-size:14px;color:var(--text2);line-height:1.6;">조기 경고 시스템 → 이탈률 <strong>20% 감소</strong></p></div>
+          </div>
+          <div style="text-align:center;min-width:120px;">
+            <div style="font-size:60px;font-weight:800;color:var(--blue);line-height:1;">82<span style="font-size:28px;">%</span></div>
+            <div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:4px;">예측 정확도</div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div style="display:flex;align-items:flex-start;gap:24px;">
+          <div style="flex:1;">
+            <div class="flag">🎯</div>
+            <div class="label">청소년 맞춤 추천 시스템</div>
+            <h3 style="font-size:18px;margin-bottom:10px;">회귀모델로 학생별 콘텐츠 개인화 추천</h3>
+            <div class="dot-line"><div class="dot"></div><p style="font-size:14px;color:var(--text2);line-height:1.6;">학년별 분리 학습: 초 55% · 중 77% · 고 77%</p></div>
+            <div class="dot-line"><div class="dot"></div><p style="font-size:14px;color:var(--text2);line-height:1.6;">미경험 학생에게 경험 학생 패턴 기반으로 추천</p></div>
+          </div>
+          <div style="text-align:center;min-width:120px;">
+            <div style="font-size:60px;font-weight:800;color:var(--blue);line-height:1;">77<span style="font-size:28px;">%</span></div>
+            <div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:4px;">중학생 기준</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="carousel-dots" id="carouselDots">
+    <div class="cdot on" onclick="setCarousel(0)"></div>
+    <div class="cdot" onclick="setCarousel(1)"></div>
+    <div class="cdot" onclick="setCarousel(2)"></div>
+    <div class="cdot" onclick="setCarousel(3)"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 3 · Deep Dive 1 — 성적 예측
+══════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="tag anim-up"">📌 사례 1 · 성적 예측</div>
+  <h2 class="anim-up d1">"이 학생, 성적 떨어질 것 같다"<br><span class="hl">데이터가 먼저 말합니다</span></h2>
+  <p class="subtitle anim-up d2" style="margin-bottom:24px;">포르투갈 395명 학생 데이터 분석 사례</p>
+
+  <div class="grid-2 anim-up d2" style="gap:20px;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card" style="padding:22px;">
+        <div class="label">분석에 사용된 변수 (X)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+          <span class="badge">이전 성적 G1·G2</span><span class="badge">출석 횟수</span>
+          <span class="badge">학습 시간</span><span class="badge">가족 관계</span>
+          <span class="badge">과외 활동</span><span class="badge">나이·성별</span>
+        </div>
+      </div>
+      <div class="card" style="padding:22px;">
+        <div class="label">모델 결과</div>
+        <div style="display:flex;align-items:flex-end;gap:8px;margin-top:4px;">
+          <div class="big-num" id="s3num" data-target="89">0</div>
+          <div style="font-size:18px;color:var(--text2);padding-bottom:8px;font-weight:700;">% 예측 정확도</div>
+        </div>
+        <p style="font-size:13px;color:var(--text2);margin-top:8px;line-height:1.6;">G2(직전 성적)의 계수가 가장 높음 → 직전 성적이 최종 성적을 가장 잘 설명</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card-light" style="flex:1;">
+        <div class="label" style="color:var(--blue);">이 모델의 활용 방식</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+          <div class="dot-line"><div class="dot"></div><p style="font-size:14px;line-height:1.6;color:var(--text2);">저예측 학생을 <strong>시험 전</strong> 미리 식별</p></div>
+          <div class="dot-line"><div class="dot"></div><p style="font-size:14px;line-height:1.6;color:var(--text2);">교사가 사전 코칭 &amp; 맞춤 피드백 제공</p></div>
+          <div class="dot-line"><div class="dot"></div><p style="font-size:14px;line-height:1.6;color:var(--text2);">개입 타이밍을 "결과 이후" → "결과 이전"으로</p></div>
+        </div>
+      </div>
+      <div class="card-blue" style="padding:20px 24px;">
+        <p style="font-size:15px;font-weight:600;line-height:1.7;">성적이 떨어진 다음 대응하는 것과,<br><strong>떨어지기 전에 막는 것.</strong><br>이 차이가 재등록률을 결정합니다.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 4 · Deep Dive 2 — 진짜 원인
+══════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="tag anim-up">📌 사례 2 · 무엇이 진짜 중요한가</div>
+  <h2 class="anim-up d1">"열심히 해라"는 이제 그만<br><span class="hl">숫자가 말하는 진짜 원인</span></h2>
+  <p class="subtitle anim-up d2" style="margin-bottom:22px;">중·고등학교 성적 영향 요인 다중회귀 분석 (실제 연구)</p>
+
+  <div class="grid-2 anim-up d2" style="gap:20px;align-items:start;">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="rank-row">
+        <div class="rank-badge rk1">1</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px;">자기주도학습 <span class="hl">β = 0.366</span></div>
+          <div class="beta-bg"><div class="beta-fill" data-width="92"></div></div>
+        </div>
+        <span class="badge">스스로 공부하는 힘</span>
+      </div>
+      <div class="rank-row">
+        <div class="rank-badge rk2">2</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px;">사교육 집중도 <span class="hl">β = 0.394</span></div>
+          <div class="beta-bg"><div class="beta-fill" data-width="98"></div></div>
+        </div>
+        <span class="badge">수업 몰입도</span>
+      </div>
+      <div class="rank-row">
+        <div class="rank-badge rk3">3</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px;">방과후 참여 <span style="color:var(--text3);">β = 0.075</span></div>
+          <div class="beta-bg"><div class="beta-fill" data-width="19" style="background:#CBD5E0;"></div></div>
+        </div>
+        <span class="badge" style="background:#F2F4F6;color:var(--text3);">상대적 낮음</span>
+      </div>
+      <div class="card-light" style="margin-top:4px;">
+        <div class="label">⚠️ 저성취 학생 위험 신호</div>
+        <p style="font-size:14px;color:var(--text2);margin-top:8px;line-height:1.6;">자기주도학습 부재 → <strong style="color:#E74C3C;">β = −0.336</strong><br>가장 강한 부정 영향 변수</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card-blue" style="padding:26px;">
+        <p style="font-size:17px;font-weight:700;line-height:1.7;margin-bottom:14px;">'공부 더 해'보다<br><strong>'어떻게 공부하는지'</strong>가<br>5배 더 중요했습니다.</p>
+        <div style="background:rgba(255,255,255,.18);border-radius:12px;padding:14px 16px;">
+          <p style="font-size:14px;line-height:1.6;opacity:.95;">학원이 개입해야 할 지점은<br>'더 많이'가 아니라 <strong>'어떻게'</strong>입니다.</p>
+        </div>
+      </div>
+      <div class="card" style="padding:20px;">
+        <div class="label">학원에서 바로 쓸 수 있는 질문</div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+          <div class="dot-line"><div class="dot"></div><p style="font-size:13px;line-height:1.5;color:var(--text2);">"자기주도 시간이 가장 적은 학생은?"</p></div>
+          <div class="dot-line"><div class="dot"></div><p style="font-size:13px;line-height:1.5;color:var(--text2);">"수업 집중도가 낮은 학생에게 맞춤 개입을 했는가?"</p></div>
+          <div class="dot-line"><div class="dot"></div><p style="font-size:13px;line-height:1.5;color:var(--text2);">"방과후보다 자습 시간이 더 효과적이지 않은가?"</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 5 · Before / After
+══════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="tag anim-up">🔄 운영 방식의 차이</div>
+  <h2 class="anim-up d1">데이터로 운영하는 학원은<br><span class="hl">무엇이 다를까요?</span></h2>
+  <p class="subtitle anim-up d2" style="margin-bottom:26px;">같은 학생, 같은 데이터. 접근법이 바뀌면 결과가 달라집니다.</p>
+
+  <div class="grid-2" style="gap:22px;">
+    <div class="ba-col before-col anim-left d2">
+      <div style="font-size:13px;font-weight:700;color:var(--text3);margin-bottom:16px;letter-spacing:.5px;">BEFORE · 감으로 운영</div>
+      <div class="ba-step"><span style="font-size:20px;">😰</span><p style="font-size:15px;line-height:1.55;color:var(--text2);">성적이 <strong>떨어진 후</strong> 인지</p></div>
+      <div class="arrow-down">↓</div>
+      <div class="ba-step"><span style="font-size:20px;">📞</span><p style="font-size:15px;line-height:1.55;color:var(--text2);">학부모 전화 먼저 옴</p></div>
+      <div class="arrow-down">↓</div>
+      <div class="ba-step"><span style="font-size:20px;">🤷</span><p style="font-size:15px;line-height:1.55;color:var(--text2);">"열심히 하겠습니다" 막연한 약속</p></div>
+      <div class="arrow-down">↓</div>
+      <div class="ba-step"><span style="font-size:20px;">😤</span><p style="font-size:15px;line-height:1.55;color:var(--text2);">학부모: "그래서 어떻게 오른다는 건가요?"</p></div>
+      <div style="margin-top:14px;padding:12px 14px;background:#FFF3F3;border-radius:12px;">
+        <p style="font-size:13px;color:#E74C3C;font-weight:600;">결과: 늦은 개입 → 신뢰 하락 → 이탈</p>
+      </div>
+    </div>
+    <div class="ba-col after-col anim-right d3">
+      <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.65);margin-bottom:16px;letter-spacing:.5px;">AFTER · 데이터로 운영</div>
+      <div class="ba-step"><span style="font-size:20px;">📊</span><p style="font-size:15px;line-height:1.55;">출석·숙제 패턴 이상 감지</p></div>
+      <div class="arrow-down w">↓</div>
+      <div class="ba-step"><span style="font-size:20px;">⚡</span><p style="font-size:15px;line-height:1.55;">회귀모델이 <strong>성적 전에</strong> 위험 신호 포착</p></div>
+      <div class="arrow-down w">↓</div>
+      <div class="ba-step"><span style="font-size:20px;">🎯</span><p style="font-size:15px;line-height:1.55;">"복습 주 2시간 추가 → 3개월 내 +8점 예상"</p></div>
+      <div class="arrow-down w">↓</div>
+      <div class="ba-step"><span style="font-size:20px;">💛</span><p style="font-size:15px;line-height:1.55;">학부모: "데이터로 관리해주는구나"</p></div>
+      <div style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.18);border-radius:12px;">
+        <p style="font-size:13px;font-weight:700;">✅ LMS 조기 개입 → 이탈률 20% 감소 (실제 연구)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 6 · 오늘의 여정 정리
+══════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="tag anim-up">✅ 오늘의 여정</div>
+  <h2 class="anim-up d1">오늘 여러분이 <span class="hl">배운 것</span></h2>
+  <p class="subtitle anim-up d2" style="margin-bottom:28px;">강의 시작 전과 지금, 무엇이 달라졌나요?</p>
+
+  <div class="grid-3" style="margin-bottom:20px;">
+    <div class="card anim-scale d2" style="text-align:center;padding:30px 22px;">
+      <div style="font-size:38px;margin-bottom:12px;">🧠</div>
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px;">알게 된 것</div>
+      <h3 style="font-size:16px;margin-bottom:8px;">회귀분석 = 경영 언어</h3>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;">어려운 통계가 아니라, 학원 성장의 방정식을 찾는 도구</p>
+    </div>
+    <div class="card anim-scale d3" style="text-align:center;padding:30px 22px;border:2px solid rgba(49,130,246,.2);">
+      <div style="font-size:38px;margin-bottom:12px;">💪</div>
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px;">할 수 있게 된 것</div>
+      <h3 style="font-size:16px;margin-bottom:8px;">숫자로 말하기</h3>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;">"복습 1시간 = 성적 2.5점 상승"을 데이터로 제시하기</p>
+    </div>
+    <div class="card anim-scale d4" style="text-align:center;padding:30px 22px;">
+      <div style="font-size:38px;margin-bottom:12px;">🏆</div>
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:8px;">갖게 된 것</div>
+      <h3 style="font-size:16px;margin-bottom:8px;">성장 방정식 초안</h3>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;">Y = aX + b, 오늘부터 우리 학원에서 만들 수 있습니다</p>
+    </div>
+  </div>
+
+  <div class="card-blue anim-up d5" style="padding:20px 28px;text-align:center;">
+    <p style="font-size:17px;font-weight:600;line-height:1.7;">
+      오늘 강의 시작 전: <span style="opacity:.8;">"열심히 하면 오를 것 같다"</span><br>
+      <strong>지금의 여러분: "얼마나 하면 몇 점 오르는지" 압니다</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 7 · 오늘 밤 할 일 3가지
+══════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="tag anim-up">🚀 액션 플랜</div>
+  <h2 class="anim-up d1">강의장을 나서는 순간부터<br><span class="hl">시작입니다</span></h2>
+  <p class="subtitle anim-up d2" style="margin-bottom:26px;">너무 많으면 아무것도 안 됩니다. 딱 3가지만.</p>
+
+  <div class="grid-3">
+    <div class="action-card anim-up d2">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="action-icon">🌙</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;">① 오늘 밤</div>
+          <div style="font-size:17px;font-weight:800;">Y를 1개 정하기</div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.65;">시험 점수 / 재등록률 / 등급 상승<br>가장 해결하고 싶은 결과 하나를 메모하기</p>
+      <div style="padding:12px 14px;background:rgba(49,130,246,.08);border-radius:10px;">
+        <p style="font-size:13px;color:var(--blue);font-weight:600;">맞고 틀리고 없습니다. 가장 절박한 것 하나.</p>
+      </div>
+    </div>
+    <div class="action-card anim-up d3">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="action-icon">📝</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;">② 이번 주</div>
+          <div style="font-size:17px;font-weight:800;">X 후보 10개 적기</div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.65;">복습시간, 숙제량, 출석률, 상담횟수...<br>Y에 영향을 줄 것 같은 원인들 나열하기</p>
+      <div style="padding:12px 14px;background:rgba(49,130,246,.08);border-radius:10px;">
+        <p style="font-size:13px;color:var(--blue);font-weight:600;">완벽하지 않아도 됩니다. 10개만 채워오세요.</p>
+      </div>
+    </div>
+    <div class="action-card anim-up d4" style="border:2px solid rgba(245,108,45,.2);">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="action-icon" style="background:linear-gradient(135deg,#F56C2D,#FF9A5C);box-shadow:0 4px 12px rgba(245,108,45,.3);">📊</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;">③ 다음 강의 전</div>
+          <div style="font-size:17px;font-weight:800;">데이터 30명 모으기</div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.65;">학생 30명이라도 충분합니다.<br>복습시간 + 시험점수, 두 줄만 있으면 됩니다.</p>
+      <div style="padding:12px 14px;background:#FFF4EF;border-radius:10px;border:1px solid rgba(245,108,45,.15);">
+        <p style="font-size:13px;color:#F56C2D;font-weight:600;">🎯 이것만 가져오시면, 우리 학원 방정식을 직접 만듭니다.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 8 · 다음 강의 예고
+══════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="tag anim-up">📅 다음 강의 예고</div>
+  <h2 class="anim-up d1">다음 시간, <span class="hl">여러분의 데이터로</span><br>직접 만듭니다</h2>
+  <p class="subtitle anim-up d2" style="margin-bottom:26px;">성적 말고, 재등록률과 이탈 예측까지</p>
+
+  <div class="grid-2 anim-up d2" style="gap:20px;margin-bottom:18px;">
+    <div class="compare-col">
+      <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:14px;letter-spacing:.5px;">오늘 · 2차시에서 한 것</div>
+      <div class="chk-row"><span style="color:var(--blue);font-weight:700;">✓</span><p style="color:var(--text2);">회귀분석이 무엇인지 알았다</p></div>
+      <div class="chk-row"><span style="color:var(--blue);font-weight:700;">✓</span><p style="color:var(--text2);">방정식의 구조와 용어를 이해했다</p></div>
+      <div class="chk-row"><span style="color:var(--blue);font-weight:700;">✓</span><p style="color:var(--text2);">전 세계 실제 사례로 가능성을 확인했다</p></div>
+      <div class="chk-row"><span style="color:var(--blue);font-weight:700;">✓</span><p style="color:var(--text2);">LLM으로 직접 분석을 돌려봤다</p></div>
+    </div>
+    <div class="next-col">
+      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:14px;letter-spacing:.5px;">다음 · 3차시에서 할 것</div>
+      <div class="chk-row"><span style="font-weight:700;">→</span><p>우리 학원 데이터를 직접 넣는다</p></div>
+      <div class="chk-row"><span style="font-weight:700;">→</span><p>우리 학원만의 성장 방정식이 나온다</p></div>
+      <div class="chk-row"><span style="font-weight:700;">→</span><p>재등록률·이탈 위험도까지 예측한다</p></div>
+      <div class="chk-row"><span style="font-weight:700;">→</span><p>학부모 상담 보고서로 바로 만든다</p></div>
+    </div>
+  </div>
+  <div class="card-blue anim-up d4" style="padding:18px 26px;text-align:center;">
+    <p style="font-size:17px;font-weight:700;line-height:1.7;">오늘이 <span style="opacity:.85;">'회귀분석을 아는 날'</span>이었다면,<br><strong>"다음은 우리 학원이 달라지는 날"</strong>입니다.</p>
+    <p style="font-size:14px;margin-top:10px;opacity:.85;">📌 숙제: 오늘 밤 정한 우리 학원의 Y, 딱 하나만 가져오세요.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SLIDE 9 · 클로징
+══════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="deco-ring" style="width:600px;height:600px;top:-200px;right:-200px;background:radial-gradient(circle,rgba(49,130,246,.09),transparent 70%);animation:pulse 4s ease-in-out infinite;"></div>
+  <div class="deco-ring" style="width:400px;height:400px;bottom:-150px;left:-100px;animation:pulse 4s ease-in-out infinite 2s;"></div>
+
+  <div class="divider anim-scale" style="margin:0 auto 26px;"></div>
+  <div class="closing-main anim-up d1">이제 여러분은<br>감으로 운영하는 학원장이 아닙니다.</div>
+  <div class="closing-sub anim-up d2">데이터로 말하는 학원장입니다.</div>
+
+  <div class="transform-row anim-up d3">
+    <div class="tr-box">
+      <div style="font-size:38px;font-weight:800;color:var(--text3);">감(感)</div>
+      <div class="tr-label">Before</div>
+    </div>
+    <div class="closing-arrow">→</div>
+    <div class="tr-box">
+      <div style="font-size:38px;font-weight:800;color:var(--blue);">숫자(數)</div>
+      <div class="tr-label" style="color:var(--blue);">After</div>
+    </div>
+  </div>
+
+  <p class="anim-up d4" style="text-align:center;margin-top:36px;font-size:14px;color:var(--text3);font-weight:500;">
+    크래빗 아카데미 &nbsp;|&nbsp; AI 학습성공방정식 2차시 &nbsp;|&nbsp; 2026.05.15
+  </p>
+</div>
+
+</div><!-- /deck -->
+
+<!-- NAV -->
+<div class="nav">
+  <button id="prev" onclick="go(-1)" disabled>‹</button>
+  <div class="nav-dots" id="navDots"></div>
+  <span class="slide-num" id="slideNum">1 / 9</span>
+  <button id="next" onclick="go(1)">›</button>
+</div>
+
+<script>
+/* ─── CURSOR ─── */
+const glow = document.getElementById('cursorGlow');
+const dot  = document.getElementById('cursorDot');
+let mx=0,my=0,gx=0,gy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+(function animGlow(){gx+=(mx-gx)*.07;gy+=(my-gy)*.07;glow.style.left=gx+'px';glow.style.top=gy+'px';requestAnimationFrame(animGlow);})();
+
+/* ─── PARTICLES ─── */
+const pc = document.getElementById('particles');
+for(let i=0;i<18;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  const s=40+Math.random()*120;
+  p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;
+    animation-duration:${12+Math.random()*18}s;
+    animation-delay:${Math.random()*15}s;`;
+  pc.appendChild(p);
+}
+
+/* ─── SLIDES ─── */
+const slides=document.querySelectorAll('.slide');
+const total=slides.length;
+let cur=0;
+
+// build dots
+const dotsEl=document.getElementById('navDots');
+for(let i=0;i<total;i++){
+  const d=document.createElement('div');
+  d.className='nav-dot'+(i===0?' on':'');
+  d.onclick=(()=>{const idx=i;return()=>goTo(idx);})();
+  dotsEl.appendChild(d);
+}
+
+function goTo(n){
+  if(n<0||n>=total||n===cur)return;
+  slides[cur].classList.remove('active');
+  cur=n;
+  slides[cur].classList.add('active');
+  slides[cur].classList.remove('enter');
+  void slides[cur].offsetWidth;
+  slides[cur].classList.add('enter');
+  document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('on',i===cur));
+  document.getElementById('slideNum').textContent=`${cur+1} / ${total}`;
+  document.getElementById('prev').disabled=cur===0;
+  document.getElementById('next').disabled=cur===total-1;
+  document.getElementById('progress').style.width=`${((cur+1)/total)*100}%`;
+  triggerSlide(cur);
+}
+function go(d){goTo(cur+d);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+});
+document.getElementById('progress').style.width=`${(1/total)*100}%`;
+
+/* ─── TRIGGER ANIMATIONS PER SLIDE ─── */
+function triggerSlide(idx){
+  // entrance anims
+  const el=slides[idx];
+  el.querySelectorAll('.anim-up,.anim-left,.anim-right,.anim-scale').forEach(e=>{
+    e.classList.remove('anim-in');void e.offsetWidth;
+    setTimeout(()=>e.classList.add('anim-in'),20);
+  });
+
+  if(idx===1){initCarousel();countUpAll('#statStrip .stat-val');}
+  if(idx===2){countUp('#s3num',89);}
+  if(idx===3){animBetaBars();}
+}
+
+// init slide 1 anims immediately
+slides[0].querySelectorAll('.anim-up,.anim-scale').forEach((e,i)=>{
+  setTimeout(()=>e.classList.add('anim-in'),100+i*100);
+});
+
+/* ─── COUNT UP ─── */
+function countUp(sel,target,duration=1400){
+  const el=document.querySelector(sel);
+  if(!el)return;
+  let start=null;
+  function step(ts){
+    if(!start)start=ts;
+    const p=Math.min((ts-start)/duration,1);
+    el.textContent=Math.round(p*target);
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function countUpAll(sel){
+  document.querySelectorAll(sel).forEach(el=>{
+    const t=parseInt(el.dataset.target)||0;
+    let start=null;
+    function step(ts){
+      if(!start)start=ts;
+      const p=Math.min((ts-start)/1200,1);
+      el.textContent=Math.round(p*t);
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+/* ─── BETA BAR ANIMATION ─── */
+function animBetaBars(){
+  document.querySelectorAll('.beta-fill').forEach((bar,i)=>{
+    bar.style.width='0';
+    setTimeout(()=>{bar.style.width=bar.dataset.width+'%';},200+i*150);
+  });
+}
+
+/* ─── CAROUSEL (slide 2) ─── */
+let carIdx=0,carTimer=null;
+const statBoxes=document.querySelectorAll('.stat-box');
+const cdots=document.querySelectorAll('.cdot');
+const track=document.getElementById('carouselTrack');
+
+function setCarousel(n){
+  carIdx=n;
+  track.style.transform=`translateX(-${n*100}%)`;
+  cdots.forEach((d,i)=>d.classList.toggle('on',i===n));
+  statBoxes.forEach((b,i)=>b.classList.toggle('active-stat',i===n));
+}
+function initCarousel(){
+  setCarousel(0);
+  clearInterval(carTimer);
+  carTimer=setInterval(()=>setCarousel((carIdx+1)%4),3000);
+}
+// expose globally
+window.setCarousel=n=>{initCarousel();clearInterval(carTimer);setCarousel(n);carTimer=setInterval(()=>setCarousel((carIdx+1)%4),3000);};
+</script>
+</body>
+</html>
