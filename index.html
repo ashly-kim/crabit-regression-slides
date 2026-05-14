@@ -36,13 +36,6 @@ body::before{
   background:var(--blue);transform:translate(-50%,-50%);
   box-shadow:0 0 12px rgba(49,130,246,.6);}
 
-/* PARTICLES */
-#particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-.particle{position:absolute;border-radius:50%;
-  background:radial-gradient(circle,rgba(49,130,246,.18),transparent 70%);
-  animation:floatUp linear infinite;}
-@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:.4}100%{transform:translateY(-20vh) scale(1);opacity:0}}
-
 /* PROGRESS */
 #progress{position:fixed;top:0;left:0;height:3px;
   background:linear-gradient(90deg,var(--blue),var(--blue2));
@@ -175,10 +168,10 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
 .chk-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:15px;line-height:1.55;}
 
 /* CLOSING */
-#s18{align-items:center;text-align:center;justify-content:center;}
-#s18 .closing-main{font-size:44px;font-weight:800;line-height:1.22;}
-#s18 .closing-sub{font-size:42px;font-weight:800;color:var(--blue);margin-top:6px;}
-#s18 .transform-row{display:flex;justify-content:center;align-items:center;gap:28px;margin-top:28px;}
+#s24{align-items:center;text-align:center;justify-content:center;}
+#s24 .closing-main{font-size:44px;font-weight:800;line-height:1.22;}
+#s24 .closing-sub{font-size:42px;font-weight:800;color:var(--blue);margin-top:6px;}
+#s24 .transform-row{display:flex;justify-content:center;align-items:center;gap:28px;margin-top:28px;}
 .closing-arrow{font-size:32px;color:var(--blue);animation:arrowRight 1.2s ease-in-out infinite;}
 @keyframes arrowRight{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
 .deco-ring{position:absolute;border-radius:50%;pointer-events:none;z-index:-1;
@@ -189,7 +182,6 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
 
 <div id="cursorGlow"></div>
 <div id="cursorDot"></div>
-<div id="particles"></div>
 <div id="progress"></div>
 
 <div class="deck">
@@ -551,8 +543,275 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S10 · Before / After ═══ -->
+<!-- ═══ S10 · 국내 사례 · 논문 표지 ═══ -->
 <div class="slide" id="s10">
+  <div class="tag anim-up">🇰🇷 국내 사례 &nbsp;·&nbsp; 한국 대학 연구</div>
+  <h2 class="anim-up d1">한국 대학에서도 <span class="hl">이미 실증된 사례</span></h2>
+
+  <div style="display:flex;gap:32px;margin-top:22px;flex:1;align-items:stretch;">
+    <div class="anim-left d2" style="flex:0 0 280px;display:flex;flex-direction:column;justify-content:center;gap:28px;">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text3);letter-spacing:1px;margin-bottom:8px;">분석 대상</div>
+        <div style="display:flex;align-items:flex-end;gap:8px;">
+          <div style="font-size:76px;font-weight:800;color:var(--blue);line-height:1;" id="paperStudents" data-target="1062">0</div>
+          <div style="font-size:20px;font-weight:700;color:var(--text2);padding-bottom:8px;">명 대학생</div>
+        </div>
+        <p style="font-size:12px;color:var(--text3);margin-top:6px;">2018.10–12 · 충청남도 A대학</p>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text3);letter-spacing:1px;margin-bottom:8px;">예측 오차율</div>
+        <div style="display:flex;align-items:flex-end;gap:8px;">
+          <div style="font-size:76px;font-weight:800;color:var(--blue);line-height:1;">8.4</div>
+          <div style="font-size:32px;font-weight:800;color:var(--blue);padding-bottom:8px;">%</div>
+        </div>
+        <p style="font-size:12px;color:var(--text3);margin-top:6px;">선형 회귀 기반 검증</p>
+      </div>
+    </div>
+
+    <div class="anim-right d2" style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+      <div style="background:#fff;border-radius:18px;padding:14px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.6);">
+        <img src="paper_screenshot.png" alt="기계학습을 활용한 대학생 학습결과 예측 연구" style="width:100%;border-radius:10px;display:block;"/>
+      </div>
+      <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px;font-weight:600;">한국콘텐츠학회논문지 v.20 no.6 (2020) · 김연희·임수진</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S11 · 분석 방법 ═══ -->
+<div class="slide" id="s11">
+  <div class="tag anim-up">📊 분석 방법</div>
+  <h2 class="anim-up d1">회귀분석은 <span class="hl">이렇게 작동했습니다</span></h2>
+  <p class="subtitle anim-up d2" style="margin-bottom:18px;">"학습시간 같은 행동이 성적에 실제로 얼마나 연결되는가"를 수치로 추정</p>
+
+  <div class="grid-2 anim-up d2" style="margin-top:6px;flex:1;align-items:stretch;gap:18px;">
+    <div class="card-light" style="padding:24px;">
+      <div class="label" style="color:var(--blue);">동시에 분석한 변수들</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+        <span class="badge">학습 시간</span><span class="badge">과제 수행</span>
+        <span class="badge">출석</span><span class="badge">학습 태도</span>
+      </div>
+      <p style="font-size:14px;color:var(--text2);margin-top:16px;line-height:1.7;">
+        각 변수가 성과에 미치는 <strong>방향과 크기를 분리해서</strong> 봅니다.
+      </p>
+      <div style="margin-top:14px;padding:14px;background:rgba(255,255,255,.55);border-radius:12px;">
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;">
+          "시간을 늘릴지 / 복습을 늘릴지 / 과제 먼저 잡을지"<br>
+          코칭 우선순위를 정할 수 있습니다.
+        </p>
+      </div>
+    </div>
+
+    <div class="card-blue" style="padding:24px;">
+      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.5px;margin-bottom:14px;">위계적 회귀의 강점</div>
+      <p style="font-size:17px;font-weight:700;line-height:1.7;">
+        개인 → 학업 → 행동 요인을<br>
+        <strong>순차 투입</strong>해서<br>
+        각 단계의 <strong>추가 설명력(R²)</strong>을 봅니다.
+      </p>
+      <div style="margin-top:18px;background:rgba(255,255,255,.15);border-radius:12px;padding:14px;">
+        <p style="font-size:14px;line-height:1.6;opacity:.92;">
+          "학습시간 효과가<br>다른 변수를 통제한 뒤에도 남는가?"<br>
+          → 검증 가능합니다.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S12 · 교육적 의미 ═══ -->
+<div class="slide" id="s12">
+  <div class="tag anim-up">💡 교육적 의미</div>
+  <h2 class="anim-up d1">"성적 예측"이 아니라<br><span class="hl">"학습 처방"입니다</span></h2>
+
+  <div style="display:flex;gap:22px;margin-top:24px;flex:1;align-items:stretch;">
+    <div class="card-light anim-left d2" style="flex:1;padding:26px;">
+      <div class="label" style="color:var(--blue);">왜 '시간 변수'부터?</div>
+      <p style="font-size:16px;color:var(--text1);font-weight:700;line-height:1.6;margin-top:12px;">
+        측정하기 쉽고<br>개입하기도 쉽기 때문입니다.
+      </p>
+      <div style="margin-top:18px;padding:16px;background:rgba(255,255,255,.55);border-radius:12px;">
+        <p style="font-size:14px;color:var(--text2);line-height:1.65;">
+          "몇 점이 나올 것이다"가 아니라<br>
+          <strong>"어떤 행동이 성적에 어떻게 작용하는가"</strong>를 보는 것.
+        </p>
+      </div>
+    </div>
+
+    <div class="card-blue anim-right d3" style="flex:1.1;padding:28px;">
+      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.5px;margin-bottom:14px;">현장에서는</div>
+      <p style="font-size:24px;font-weight:800;line-height:1.4;">
+        <span style="opacity:.6;">"성적 예측"보다</span><br>
+        <strong>"학습 처방"</strong>에<br>
+        더 자주 쓰입니다.
+      </p>
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;opacity:.95;">
+          <span style="font-weight:800;">✓</span><p>학습시간 배분 설계</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;opacity:.95;">
+          <span style="font-weight:800;">✓</span><p>과목별 복습 우선순위</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;opacity:.95;">
+          <span style="font-weight:800;">✓</span><p>개입 우선순위 결정</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S13 · 주의사항 타이틀 ═══ -->
+<div class="slide" id="s13">
+  <div class="tag anim-up" style="background:rgba(231,76,60,.1);color:#E74C3C;border-color:rgba(231,76,60,.18);">⚠️ 잠깐, 가장 중요한 이야기</div>
+  <div style="font-size:36px;font-weight:800;line-height:1.32;margin-top:8px;" class="anim-up d1">
+    회귀분석을 배웠다고<br>
+    "우리 학원은 이제 <span style="color:#E74C3C;">성적을 예측할 수 있어!</span>"<br>
+    라고 생각하시면 안 됩니다.
+  </div>
+  <p class="subtitle anim-up d2" style="margin-top:16px;">
+    리포트는 <strong>강력한 참고자료</strong>이지만,<br>결과를 그대로 단정적으로 해석하면 위험합니다.
+  </p>
+
+  <div class="grid-2 anim-up d3" style="margin-top:30px;gap:18px;">
+    <div class="card-light" style="padding:22px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#3182F6,#5B9EF7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;">👩‍🏫</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;">다음 슬라이드</div>
+          <h3 style="font-size:18px;">원장님·선생님이 주의할 점</h3>
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--text2);margin-top:14px;line-height:1.6;"><strong>"예측"과 "판정"</strong>을 구분해야 합니다.</p>
+    </div>
+    <div class="card-light" style="padding:22px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#3182F6,#5B9EF7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;">👨‍👩‍👧</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.5px;">그 다음</div>
+          <h3 style="font-size:18px;">학부모·학생이 주의할 점</h3>
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--text2);margin-top:14px;line-height:1.6;"><strong>"설명"과 "운명"</strong>을 구분해서 봐야 합니다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S14 · 원장님·선생님 주의사항 ═══ -->
+<div class="slide" id="s14">
+  <div class="tag anim-up" style="background:rgba(231,76,60,.1);color:#E74C3C;border-color:rgba(231,76,60,.18);">⚠️ 원장님·선생님이 주의할 점</div>
+  <h2 class="anim-up d1">분석 결과, <span class="hl">이렇게 다뤄야 합니다</span></h2>
+
+  <div class="grid-2 anim-up d2" style="margin-top:18px;gap:12px;flex:1;align-content:start;">
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">01</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">인과로 단정하지 않기</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">회귀계수는 관련성과 기대 변화일 뿐, 무조건 오른다는 보장이 아닙니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">02</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">과도한 일반화 금지</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">한 반의 결과를 모든 학생에게 그대로 적용하면 오판이 생깁니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">03</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">변수 해석의 함정 주의</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">공부시간이 길다고 항상 좋은 건 아닙니다. 기초가 약하면 점수가 늦게 오릅니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">04</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">낙인 효과 방지</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">"위험 학생" 같은 표현은 위축을 줍니다. 말투와 공개 범위를 조심하세요.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">05</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">데이터 품질 확인</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">출석·과제·학습시간 입력값이 부정확하면 리포트 전체 신뢰도가 떨어집니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">06</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">행동 중심 언어로 번역</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">통계 용어 대신 "주당 복습 N시간 = 기대점수 +M점"으로 말합니다.</p>
+      </div>
+    </div>
+    <div class="card-blue" style="padding:16px 18px;display:flex;gap:14px;align-items:center;grid-column:1 / -1;">
+      <div style="font-size:22px;font-weight:800;line-height:1;flex-shrink:0;min-width:30px;">07</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">정기 재학습 필수</h3>
+        <p style="font-size:13px;opacity:.92;line-height:1.55;">시험 난도·교재·학년 분위기가 바뀌면 모델도 다시 점검해야 합니다.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S15 · 학부모·학생 주의사항 ═══ -->
+<div class="slide" id="s15">
+  <div class="tag anim-up" style="background:rgba(231,76,60,.1);color:#E74C3C;border-color:rgba(231,76,60,.18);">⚠️ 학부모·학생이 주의할 점</div>
+  <h2 class="anim-up d1">리포트, <span class="hl">이렇게 읽어야 합니다</span></h2>
+
+  <div class="grid-2 anim-up d2" style="margin-top:18px;gap:12px;flex:1;align-content:start;">
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">01</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">예측값을 절대값으로 믿지 않기</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">리포트는 미래를 확정하는 게 아니라, 현재 데이터를 바탕으로 한 추정치입니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">02</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">한 번의 결과로 판단하지 않기</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">최근 시험 한 번보다 여러 회차의 추세를 함께 보는 게 맞습니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">03</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">개인 차이를 고려하기</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">같은 학습시간이라도 이해도·집중력·과목 난이도에 따라 효과가 다릅니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">04</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">행동 목표로 읽기</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">"점수 몇 점"보다 "어떤 습관을 바꿀지"에 집중해야 실질적 도움이 됩니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">05</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">비교 스트레스 조심</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">다른 학생과의 단순 비교보다 자기 변화 추적이 더 중요합니다.</p>
+      </div>
+    </div>
+    <div class="card" style="padding:16px 18px;display:flex;gap:14px;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);line-height:1;flex-shrink:0;min-width:30px;">06</div>
+      <div>
+        <h3 style="font-size:15px;margin-bottom:4px;">질문을 남기기</h3>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">어떤 변수로 계산했는지, 언제 데이터인지, 과목별인지 확인하세요.</p>
+      </div>
+    </div>
+    <div class="card-blue" style="padding:18px 22px;text-align:center;grid-column:1 / -1;">
+      <p style="font-size:15px;font-weight:700;line-height:1.7;">
+        리포트의 핵심은 <span style="opacity:.7;">"누가 잘못했나"</span>가 아니라<br>
+        <strong>"무엇을 바꾸면 좋아질 가능성이 큰가"</strong>입니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ S16 · Before / After ═══ -->
+<div class="slide" id="s16">
   <div class="tag anim-up">🔄 운영 방식의 차이</div>
   <h2 class="anim-up d1">데이터로 운영하는 학원은<br><span class="hl">무엇이 다를까요?</span></h2>
 
@@ -586,8 +845,8 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S11 · 오늘의 여정 1/3 · 알게 된 것 ═══ -->
-<div class="slide" id="s11">
+<!-- ═══ S17 · 오늘의 여정 1/3 · 알게 된 것 ═══ -->
+<div class="slide" id="s17">
   <div class="tag anim-up">✅ 오늘의 여정 1 / 3</div>
   <h2 class="anim-up d1">오늘 여러분이 <span class="hl">알게 된 것</span></h2>
 
@@ -613,8 +872,8 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S12 · 오늘의 여정 2/3 · 할 수 있게 된 것 ═══ -->
-<div class="slide" id="s12">
+<!-- ═══ S18 · 오늘의 여정 2/3 · 할 수 있게 된 것 ═══ -->
+<div class="slide" id="s18">
   <div class="tag anim-up">✅ 오늘의 여정 2 / 3</div>
   <h2 class="anim-up d1">오늘 여러분이 <span class="hl">할 수 있게 된 것</span></h2>
 
@@ -640,8 +899,8 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S13 · 오늘의 여정 3/3 · 갖게 된 것 ═══ -->
-<div class="slide" id="s13">
+<!-- ═══ S19 · 오늘의 여정 3/3 · 갖게 된 것 ═══ -->
+<div class="slide" id="s19">
   <div class="tag anim-up">✅ 오늘의 여정 3 / 3</div>
   <h2 class="anim-up d1">오늘 여러분이 <span class="hl">갖게 된 것</span></h2>
 
@@ -674,8 +933,8 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S14 · 액션 1/3 · 오늘 밤 ═══ -->
-<div class="slide" id="s14">
+<!-- ═══ S20 · 액션 1/3 · 오늘 밤 ═══ -->
+<div class="slide" id="s20">
   <div class="tag anim-up">🚀 액션 플랜 1 / 3</div>
   <h2 class="anim-up d1">강의장을 나서는 순간부터<br><span class="hl">시작입니다</span></h2>
 
@@ -722,8 +981,8 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S15 · 액션 2/3 · 이번 주 ═══ -->
-<div class="slide" id="s15">
+<!-- ═══ S21 · 액션 2/3 · 이번 주 ═══ -->
+<div class="slide" id="s21">
   <div class="tag anim-up">🚀 액션 플랜 2 / 3</div>
   <h2 class="anim-up d1">딱 3가지만<br><span class="hl">이번 주, X 후보 10개</span></h2>
 
@@ -770,8 +1029,8 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S16 · 액션 3/3 · 다음 강의 전 ═══ -->
-<div class="slide" id="s16">
+<!-- ═══ S22 · 액션 3/3 · 다음 강의 전 ═══ -->
+<div class="slide" id="s22">
   <div class="tag anim-up">🚀 액션 플랜 3 / 3</div>
   <h2 class="anim-up d1">딱 3가지만<br><span class="hl">다음 강의 전, 데이터 30명</span></h2>
 
@@ -818,8 +1077,8 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S17 · 다음 강의 예고 ═══ -->
-<div class="slide" id="s17">
+<!-- ═══ S23 · 다음 강의 예고 ═══ -->
+<div class="slide" id="s23">
   <div class="tag anim-up">📅 다음 강의 예고</div>
   <h2 class="anim-up d1">다음 시간, <span class="hl">여러분의 데이터로</span><br>직접 만듭니다</h2>
   <p class="subtitle anim-up d2" style="margin-bottom:22px;">성적 말고, 재등록률과 이탈 예측까지</p>
@@ -846,8 +1105,8 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
   </div>
 </div>
 
-<!-- ═══ S18 · 클로징 ═══ -->
-<div class="slide" id="s18">
+<!-- ═══ S24 · 클로징 ═══ -->
+<div class="slide" id="s24">
   <div class="deco-ring" style="width:600px;height:600px;top:-200px;right:-200px;animation:pulse 4s ease-in-out infinite;"></div>
   <div class="deco-ring" style="width:400px;height:400px;bottom:-150px;left:-100px;animation:pulse 4s ease-in-out infinite 2s;"></div>
 
@@ -875,9 +1134,9 @@ h3{font-size:18px;font-weight:700;line-height:1.3;}
 </div><!-- /deck -->
 
 <div class="nav">
-  <button id="prev" onclick="go(-1)" disabled>‹</button>
+  <button id="prev" onclick="go(-1)">‹</button>
   <div class="nav-dots" id="navDots"></div>
-  <span class="slide-num" id="slideNum">1 / 19</span>
+  <span class="slide-num" id="slideNum">1 / 25</span>
   <button id="next" onclick="go(1)">›</button>
 </div>
 
@@ -887,15 +1146,6 @@ const glow=document.getElementById('cursorGlow'),dot=document.getElementById('cu
 let mx=0,my=0,gx=0,gy=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
 (function animGlow(){gx+=(mx-gx)*.07;gy+=(my-gy)*.07;glow.style.left=gx+'px';glow.style.top=gy+'px';requestAnimationFrame(animGlow);})();
-
-/* PARTICLES */
-const pc=document.getElementById('particles');
-for(let i=0;i<18;i++){
-  const p=document.createElement('div');p.className='particle';
-  const s=40+Math.random()*120;
-  p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${12+Math.random()*18}s;animation-delay:${Math.random()*15}s;`;
-  pc.appendChild(p);
-}
 
 /* SLIDES */
 const slides=document.querySelectorAll('.slide');
@@ -911,7 +1161,9 @@ for(let i=0;i<total;i++){
 }
 
 function goTo(n){
-  if(n<0||n>=total||n===cur)return;
+  if(n===cur)return;
+  if(n<0) n=total-1;
+  if(n>=total) n=0;
   slides[cur].classList.remove('active');
   cur=n;
   slides[cur].classList.add('active');
@@ -920,8 +1172,6 @@ function goTo(n){
   slides[cur].classList.add('enter');
   document.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('on',i===cur));
   document.getElementById('slideNum').textContent=`${cur+1} / ${total}`;
-  document.getElementById('prev').disabled=cur===0;
-  document.getElementById('next').disabled=cur===total-1;
   document.getElementById('progress').style.width=`${((cur+1)/total)*100}%`;
   triggerSlide(cur);
 }
@@ -930,7 +1180,16 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);
   if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
 });
+/* CLICK-AREA NAV: left half = prev, right half = next */
+document.addEventListener('click',e=>{
+  if(e.target.closest('.nav')) return;
+  if(e.target.closest('a,button,input,textarea,select')) return;
+  const x=e.clientX, w=window.innerWidth;
+  if(x < w/2) go(-1);
+  else go(1);
+});
 document.getElementById('progress').style.width=`${(1/total)*100}%`;
+document.getElementById('slideNum').textContent=`1 / ${total}`;
 
 /* PER-SLIDE TRIGGERS */
 function triggerSlide(idx){
@@ -945,6 +1204,7 @@ function triggerSlide(idx){
   if(idx===5){countUp('#s5num',77);animBarsInSlide(slides[5]);}
   if(idx===6) countUp('#s6num',89);
   if(idx===7||idx===8||idx===9) animBarsInSlide(slides[idx]);
+  if(idx===10) countUp('#paperStudents',1062);
 }
 
 slides[0].querySelectorAll('.anim-up,.anim-scale').forEach((e,i)=>{
